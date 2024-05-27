@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
+import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -43,7 +44,7 @@ public class WxPortalController {
     }
 
     @GetMapping("/callBack")
-    public RedirectView callBack(@RequestParam String code) {
+    public RedirectView callBack(@RequestParam String code) throws WxErrorException {
 //        try {
 //            WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
 //            WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
@@ -54,6 +55,9 @@ public class WxPortalController {
 //        RedirectView redirectView = new RedirectView();
 //        redirectView.setUrl("https://mp.weixin.qq.com/s/m1SRsBG96kLJW5mPe4AVGA");
 //        return redirectView;
+        WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
+        WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
+        log.info("userInfo:{}", userInfo);
         return null;
     }
 

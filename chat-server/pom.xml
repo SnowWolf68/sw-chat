@@ -27,6 +27,11 @@
             <artifactId>mybatis-plus-generator</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-mp</artifactId>
+            <version>4.4.0</version>
+        </dependency>
     </dependencies>
 
 </project>

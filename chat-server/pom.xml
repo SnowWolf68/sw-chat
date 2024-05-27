@@ -22,6 +22,11 @@
             <groupId>com.snwolf</groupId>
             <artifactId>chat-common-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

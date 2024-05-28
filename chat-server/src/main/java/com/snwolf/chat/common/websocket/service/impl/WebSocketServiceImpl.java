@@ -59,6 +59,13 @@ public class WebSocketServiceImpl implements WebSocketService {
         sendMsg(channel, WebSocketAdapter.build(wxMpQrCodeTicket));
     }
 
+    @Override
+    public void remove(Channel channel) {
+        ONLINE_WS_MAP.remove(channel);
+        // todo: 用户下线广播
+
+    }
+
     private void sendMsg(Channel channel, WSBaseResp<?> response) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(response)));
     }
@@ -73,7 +80,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         Integer code;
         do {
             code = RandomUtil.randomInt(Integer.MAX_VALUE);
-        } while (ObjectUtil.isNull(WAIT_LOGIN_MAP.asMap().putIfAbsent(code, channel)));
+        } while (ObjectUtil.isNotNull(WAIT_LOGIN_MAP.asMap().putIfAbsent(code, channel)));
         return code;
     }
 }

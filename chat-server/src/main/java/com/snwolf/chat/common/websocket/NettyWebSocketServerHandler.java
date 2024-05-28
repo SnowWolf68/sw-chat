@@ -39,11 +39,24 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             if(event.state() == IdleState.READER_IDLE){
                 log.info("读空闲");
                 // todo: 用户下线
-
-
-                ctx.channel().close();
+                userOffLine(ctx);
             }
         }
+    }
+
+    /**
+     * 客户端主动下线
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        userOffLine(ctx);
+    }
+
+    private void userOffLine(ChannelHandlerContext ctx) {
+        ctx.channel().close();
+        webSocketService.remove(ctx.channel());
     }
 
     @Override

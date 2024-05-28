@@ -9,4 +9,6 @@ public interface WebSocketService {
     void connect(Channel channel);
 
     void handleLoginReq(Channel channel) throws WxErrorException;
+
+    void remove(Channel channel);
 }

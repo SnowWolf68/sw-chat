@@ -1,8 +1,10 @@
 package com.snwolf.chat.common.websocket;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.snwolf.chat.common.websocket.domain.enums.WSReqTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.request.WSBaseReq;
+import com.snwolf.chat.common.websocket.service.WebSocketService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -13,6 +15,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+
+    private WebSocketService webSocketService;
+
+    /**
+     * 建立连接
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        webSocketService = SpringUtil.getBean(WebSocketService.class);
+        // 保存channel
+        webSocketService.connect(ctx.channel());
+    }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -41,8 +57,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             case HEARTBEAT:
                 break;
             case LOGIN:
-                log.info("请求登录二维码");
-                channelHandlerContext.channel().writeAndFlush(new TextWebSocketFrame("123"));
+                webSocketService.handleLoginReq(channelHandlerContext.channel());
         }
     }
 }

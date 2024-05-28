@@ -1,5 +1,7 @@
 package com.snwolf.chat.common.user.service.handler;
 
+import com.snwolf.chat.common.user.service.adapter.TextBuilder;
+import com.snwolf.chat.common.user.service.WXMsgService;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -16,8 +18,8 @@ import java.util.Map;
 @Component
 public class SubscribeHandler extends AbstractHandler {
 
-//    @Autowired
-//    private WxMsgService wxMsgService;
+    @Autowired
+    private WXMsgService wxMsgService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -25,34 +27,34 @@ public class SubscribeHandler extends AbstractHandler {
                                     WxSessionManager sessionManager) throws WxErrorException {
 
         this.logger.info("新关注用户 OPENID: " + wxMessage.getFromUser());
-//
-//        WxMpXmlOutMessage responseResult = null;
-//        try {
-//            responseResult = this.handleSpecial(weixinService, wxMessage);
-//        } catch (Exception e) {
-//            this.logger.error(e.getMessage(), e);
-//        }
-//
-//        if (responseResult != null) {
-//            return responseResult;
-//        }
-//
+
+        // enentKey: qrscene_921254536
+        WxMpXmlOutMessage responseResult = null;
+        try {
+            responseResult = wxMsgService.scan(weixinService, wxMessage);
+        } catch (Exception e) {
+            this.logger.error(e.getMessage(), e);
+        }
+
+        if (responseResult != null) {
+            return responseResult;
+        }
+
 //        try {
 //            return new TextBuilder().build("感谢关注", wxMessage, weixinService);
 //        } catch (Exception e) {
 //            this.logger.error(e.getMessage(), e);
 //        }
 
-        return null;
+        return TextBuilder.build("感谢关注", wxMessage);
     }
 
-    /**
-     * 处理特殊请求，比如如果是扫码进来的，可以做相应处理
-     */
-    private WxMpXmlOutMessage handleSpecial(WxMpService weixinService, WxMpXmlMessage wxMessage)
-            throws Exception {
+//    /**
+//     * 处理特殊请求，比如如果是扫码进来的，可以做相应处理
+//     */
+//    private WxMpXmlOutMessage handleSpecial(WxMpService weixinService, WxMpXmlMessage wxMessage)
+//            throws Exception {
 //        return wxMsgService.scan(weixinService, wxMessage);
-        return null;
-    }
+//    }
 
 }

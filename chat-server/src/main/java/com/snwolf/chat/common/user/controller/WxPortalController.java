@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.user.controller;
 
+import com.snwolf.chat.common.user.service.WXMsgService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -23,7 +24,7 @@ public class WxPortalController {
 
     private final WxMpService wxService;
     private final WxMpMessageRouter messageRouter;
-//    private final WxMsgService wxMsgService;
+    private final WXMsgService wxMsgService;
 
     @GetMapping("/test")
     public String test(@RequestParam String code) throws WxErrorException {
@@ -68,7 +69,10 @@ public class WxPortalController {
         WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
         WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
         log.info("userInfo:{}", userInfo);
-        return null;
+        wxMsgService.authorize(userInfo);
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl("www.baidu.com");
+        return redirectView;
     }
 
     @PostMapping(produces = "application/xml; charset=UTF-8")

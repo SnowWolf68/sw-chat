@@ -1,9 +1,11 @@
 package com.snwolf.chat.common.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.snwolf.chat.common.websocket.domain.enums.WSReqTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.request.WSBaseReq;
+import com.snwolf.chat.common.websocket.service.NettyUtils;
 import com.snwolf.chat.common.websocket.service.WebSocketService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -34,6 +36,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if(evt instanceof WebSocketServerProtocolHandler.HandshakeComplete){
             log.info("握手成功");
+            String token = NettyUtils.getAttr(ctx.channel(), NettyUtils.TOKEN_KEY);
+            if(StrUtil.isNotBlank(token)){
+                webSocketService.authorize(ctx.channel(), token);
+            }
         }else if(evt instanceof IdleStateEvent){
             IdleStateEvent event = (IdleStateEvent) evt;
             if(event.state() == IdleState.READER_IDLE){

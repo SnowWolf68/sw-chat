@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.websocket;
 
+import com.snwolf.chat.common.websocket.service.MyAcquireHeaderHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -80,6 +81,8 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpObjectAggregator(8192));
                         //保存用户ip
                         // pipeline.addLast(new HttpHeadersHandler());
+                        // 自定义请求头处理器, 保存请求头
+                        pipeline.addLast(new MyAcquireHeaderHandler());
                         /**
                          * 说明：
                          *  1. 对于 WebSocket，它的数据是以帧frame 的形式传递的；

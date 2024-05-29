@@ -9,9 +9,7 @@ import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.service.LoginService;
 import com.snwolf.chat.common.websocket.domain.dto.WSChannelExtraDTO;
-import com.snwolf.chat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
-import com.snwolf.chat.common.websocket.domain.vo.response.WSLoginUrl;
 import com.snwolf.chat.common.websocket.service.WebSocketService;
 import com.snwolf.chat.common.websocket.service.adapter.WebSocketAdapter;
 import io.netty.channel.Channel;
@@ -89,7 +87,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         WAIT_LOGIN_MAP.invalidate(code);
         // 调用登录模块, 获取token
         String token = loginService.login(id);
-        sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+        loginSuccess(channel, token, user);
     }
 
     @Override
@@ -101,8 +99,26 @@ public class WebSocketServiceImpl implements WebSocketService {
         sendMsg(channel, WebSocketAdapter.buildWaitAuthorizeResp());
     }
 
+    @Override
+    public void authorize(Channel channel, String token) {
+        Long validUid = loginService.getValidUid(token);
+        if(ObjectUtil.isNull(validUid)){
+            // token过期了, 需要发一条消息, 通知前端重新登录
+            sendMsg(channel, WebSocketAdapter.buildInvalidResp());
+            return;
+        }
+        User user = userDao.getById(validUid);
+        loginSuccess(channel, token, user);
+    }
+
     private void sendMsg(Channel channel, WSBaseResp<?> response) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(response)));
+    }
+
+    private void loginSuccess(Channel channel, String token, User user) {
+        ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO(user.getId()));
+        // todo: 用户上线成功的事件
+        sendMsg(channel, WebSocketAdapter.buildResp(user, token));
     }
 
     /**

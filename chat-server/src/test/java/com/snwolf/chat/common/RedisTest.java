@@ -30,14 +30,14 @@ public class RedisTest {
     @Test
     void test2(){
         Boolean result = RedisUtils.set("redisKey", "value");
-        String value = RedisUtils.get("redisKey");
+        String value = RedisUtils.getStr("redisKey");
         log.info("result: {}, value: {}", result, value);
     }
 
     @Test
     void test3(){
         Boolean result = RedisUtils.set("redisKey", "value");
-        String value = RedisUtils.get("redisKey");
+        String value = RedisUtils.getStr("redisKey");
         log.info("result: {}, value: {}", result, value);
     }
 

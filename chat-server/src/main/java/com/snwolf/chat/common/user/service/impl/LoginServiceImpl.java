@@ -6,6 +6,7 @@ import com.snwolf.chat.common.common.constant.RedisKeyConstant;
 import com.snwolf.chat.common.common.utils.JwtUtils;
 import com.snwolf.chat.common.common.utils.RedisUtils;
 import com.snwolf.chat.common.user.service.LoginService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,13 +17,27 @@ import java.util.concurrent.TimeUnit;
 public class LoginServiceImpl implements LoginService {
 
     public static final int TOKEN_EXPIRE_DAYS = 3;
+    public static final int TOKEN_RENEW_DAYS = 1;
 
     @Resource
     private JwtUtils jwtUtils;
 
     @Override
+    @Async
     public void renewalTokenIfNecessary(String token) {
-
+        Long uid = getValidUid(token);
+        if(ObjectUtil.isNull(uid)){
+            return;
+        }
+        String userTokenKey = getUserTokenKey(uid);
+        Long expireDays = RedisUtils.getExpire(userTokenKey, TimeUnit.DAYS);
+        if(expireDays == -2){
+            // 不存在的key
+            return;
+        }
+        if(expireDays < TOKEN_RENEW_DAYS){
+            RedisUtils.expire(userTokenKey, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
+        }
     }
 
     @Override

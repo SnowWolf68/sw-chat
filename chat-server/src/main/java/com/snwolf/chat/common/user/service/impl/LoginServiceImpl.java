@@ -9,6 +9,7 @@ import com.snwolf.chat.common.user.service.LoginService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,15 +35,15 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public Long getValidUid(String token) {
         Long uid = jwtUtils.getUidOrNull(token);
-        if(ObjectUtil.isNull(uid)){
+        if (ObjectUtil.isNull(uid)) {
             return null;
         }
         String userTokenKey = getUserTokenKey(uid);
         String oldToken = RedisUtils.get(userTokenKey);
-        if(StrUtil.isBlank(oldToken)){
+        if (StrUtil.isBlank(oldToken)) {
             return null;
         }
-        return uid;
+        return Objects.equals(oldToken, token) ? uid : null;
     }
 
     private static String getUserTokenKey(Long uid) {

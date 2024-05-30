@@ -6,6 +6,8 @@ import com.snwolf.chat.common.user.mapper.UserBackpackMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 用户背包表 服务实现类
@@ -25,7 +27,7 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
                 .count();
     }
 
-    public UserBackpack getFirstValidItem(Long uid, Integer itemId) {
+    public UserBackpack getFirstUnusedItem(Long uid, Integer itemId) {
         return lambdaQuery()
                 .eq(UserBackpack::getUid, uid)
                 .eq(UserBackpack::getItemId, itemId)
@@ -41,5 +43,22 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
                 .eq(UserBackpack::getStatus, StatusEnum.STATUS_INVALID.getStatus())
                 .set(UserBackpack::getStatus, StatusEnum.STATUS_VALID.getStatus())
                 .update();
+    }
+
+    public List<UserBackpack> getByItemIds(Long uid, List<Long> ids) {
+        return lambdaQuery()
+                .eq(UserBackpack::getUid, uid)
+                .eq(UserBackpack::getStatus, StatusEnum.STATUS_INVALID.getStatus())
+                .in(UserBackpack::getItemId, ids)
+                .list();
+    }
+
+    public UserBackpack getFirstItem(Long uid, Long itemId) {
+        return lambdaQuery()
+                .eq(UserBackpack::getUid, uid)
+                .eq(UserBackpack::getItemId, itemId)
+                .orderByAsc(UserBackpack::getCreateTime)
+                .last("limit 1")
+                .one();
     }
 }

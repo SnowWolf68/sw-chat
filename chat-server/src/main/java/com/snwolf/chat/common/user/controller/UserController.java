@@ -1,7 +1,10 @@
 package com.snwolf.chat.common.user.controller;
 
+import com.snwolf.chat.common.common.domain.vo.req.WearingBadgeReq;
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
+import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.domain.vo.req.ModifyNameReq;
+import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 import com.snwolf.chat.common.user.service.UserService;
 import io.swagger.annotations.Api;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -40,6 +44,19 @@ public class UserController {
     @ApiOperation("用户改名")
     public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameReq modifyNameReq) {
         userService.modifyName(modifyNameReq.getName());
+        return ApiResult.success();
+    }
+
+    @GetMapping("/badges")
+    @ApiOperation("可选徽章列表预览")
+    public ApiResult<List<BadgesResp>> badges(){
+        return ApiResult.success(userService.badges(RequestHolder.getUserInfo().getUid()));
+    }
+
+    @PutMapping("/badge")
+    @ApiOperation("佩戴徽章")
+    public ApiResult<?> wearingBadge(@Valid @RequestBody WearingBadgeReq wearingBadgeReq){
+        userService.wearingBagde(RequestHolder.getUserInfo().getUid(), wearingBadgeReq.getItemId());
         return ApiResult.success();
     }
 }

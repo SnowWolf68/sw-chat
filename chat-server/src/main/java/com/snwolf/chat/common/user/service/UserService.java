@@ -1,7 +1,10 @@
 package com.snwolf.chat.common.user.service;
 
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,4 +21,8 @@ public interface UserService {
     UserInfoResp getUserInfo();
 
     void modifyName(String name);
+
+    List<BadgesResp> badges(Long uid);
+
+    void wearingBagde(Long uid, Long itemId);
 }

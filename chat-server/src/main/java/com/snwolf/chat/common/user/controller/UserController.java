@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping("/userInfo")
     @ApiOperation("获取用户个人信息")
-    public ApiResult<UserInfoResp> getUserInfo(HttpServletRequest request) {
+    public ApiResult<UserInfoResp> getUserInfo() {
         Long uid = RequestHolder.getUserInfo().getUid();
         log.info("uid:{}", uid);
         return null;

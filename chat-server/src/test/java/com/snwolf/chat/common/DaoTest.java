@@ -2,6 +2,7 @@ package com.snwolf.chat.common;
 
 import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,9 @@ public class DaoTest {
 
     @Resource
     private UserDao userDao;
+
+    @Resource
+    private LoginService loginService;
 
     @Test
     void test(){
@@ -28,5 +32,11 @@ public class DaoTest {
                 .eq(User::getName, "zhangsan")
                 .one();
         log.info("getUser:{}",getUser);
+    }
+
+    @Test
+    void test2(){
+        String token = loginService.login(20003L);
+        log.info(token);
     }
 }

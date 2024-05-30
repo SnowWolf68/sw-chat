@@ -48,4 +48,10 @@ public class RedisTest {
         lock.unlock();
     }
 
+    @Test
+    void test5(){
+        String token = RedisUtils.get("swchat:userToken:uid_20003", String.class);
+        log.info("token: {}", token);
+    }
+
 }

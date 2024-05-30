@@ -3,10 +3,12 @@ package com.snwolf.chat.common.user.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.snwolf.chat.common.common.exception.BusinessException;
+import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.dao.UserBackpackDao;
 import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.entity.UserBackpack;
 import com.snwolf.chat.common.user.domain.enums.ItemTypeEnum;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 import com.snwolf.chat.common.user.service.UserService;
@@ -41,11 +43,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void modifyName(String name) {
         User oldUser = userDao.getByName(name);
-        if(ObjectUtil.isNotNull(oldUser)){
-            // 用户名已存在
-            throw new BusinessException("用户名已存在");
+        AssertUtil.isEmpty(oldUser, "用户名已存在");
+        Long uid = RequestHolder.getUserInfo().getUid();
+        UserBackpack modifyNameItem = userBackpackDao.getFirstValidItem(uid, ItemTypeEnum.MODIFY_NAME_CARD.getType());
+        AssertUtil.isNotEmpty(modifyNameItem, "改名卡已用完");
+        // 开始改名
+        boolean result = userBackpackDao.useItem(modifyNameItem);
+        if(result){
+            // 改名
+            userDao.modifyName(uid, name);
+            // todo: 删除缓存
         }
     }
 }

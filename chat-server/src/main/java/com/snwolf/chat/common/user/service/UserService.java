@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.user.service;
 
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 
 /**
  * <p>
@@ -13,4 +14,6 @@ import com.snwolf.chat.common.user.domain.entity.User;
 public interface UserService {
 
     Long register(User user);
+
+    UserInfoResp getUserInfo();
 }

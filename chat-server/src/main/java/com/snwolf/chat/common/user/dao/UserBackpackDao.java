@@ -1,8 +1,8 @@
 package com.snwolf.chat.common.user.dao;
 
+import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.UserBackpack;
 import com.snwolf.chat.common.user.mapper.UserBackpackMapper;
-import com.snwolf.chat.common.user.service.IUserBackpackService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -17,4 +17,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpack> {
 
+    public Integer getCountByValidItemId(Long uid, Integer itemId) {
+        return lambdaQuery()
+                .eq(UserBackpack::getUid, uid)
+                .eq(UserBackpack::getItemId, itemId)
+                .eq(UserBackpack::getStatus, StatusEnum.STATUS_INVALID)
+                .count();
+    }
 }

@@ -25,6 +25,12 @@ public class GlobalExceptionHandler {
         return ApiResult.fail(CommonErrorEnum.PARAM_INVALID.getCode(), errMsg);
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ApiResult<?> handleBusinessException(BusinessException e) {
+        log.info("业务异常: ", e);
+        return ApiResult.fail(e.getErrorCode(), e.getErrorMsg());
+    }
+
     @ExceptionHandler(Exception.class)
     public ApiResult<?> handleException(Exception e) {
         log.error("系统异常: ", e);

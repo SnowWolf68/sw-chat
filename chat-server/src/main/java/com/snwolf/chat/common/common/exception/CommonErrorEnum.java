@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum CommonErrorEnum implements ErrorEnum{
 
     PARAM_INVALID(-2, "参数校验失败"),
-    SYSTEM_ERROR(-1, "系统出小差了, 请稍后再试...")
+    SYSTEM_ERROR(-1, "系统出小差了, 请稍后再试..."),
+    BUSINESS_ERROR(0, "{}")
     ;
 
     private final Integer code;

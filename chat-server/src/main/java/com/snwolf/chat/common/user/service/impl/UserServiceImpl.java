@@ -1,6 +1,8 @@
 package com.snwolf.chat.common.user.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.snwolf.chat.common.common.exception.BusinessException;
 import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.dao.UserBackpackDao;
 import com.snwolf.chat.common.user.dao.UserDao;
@@ -40,6 +42,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void modifyName(String name) {
-
+        User oldUser = userDao.getByName(name);
+        if(ObjectUtil.isNotNull(oldUser)){
+            // 用户名已存在
+            throw new BusinessException("用户名已存在");
+        }
     }
 }

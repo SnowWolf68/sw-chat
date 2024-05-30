@@ -16,4 +16,6 @@ public interface UserService {
     Long register(User user);
 
     UserInfoResp getUserInfo();
+
+    void modifyName(String name);
 }

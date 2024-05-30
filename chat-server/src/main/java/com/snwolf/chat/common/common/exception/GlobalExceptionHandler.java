@@ -2,8 +2,6 @@ package com.snwolf.chat.common.common.exception;
 
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,72 +10,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /**
-     * validation参数校验异常
-     */
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ApiResult methodArgumentNotValidExceptionExceptionHandler(MethodArgumentNotValidException e) {
-        StringBuilder errorMsg = new StringBuilder();
-        e.getBindingResult().getFieldErrors().forEach(x -> errorMsg.append(x.getField()).append(x.getDefaultMessage()).append(","));
-        String message = errorMsg.toString();
-        log.info("validation parameters error！The reason is:{}", message);
-        return ApiResult.fail(CommonErrorEnum.PARAM_VALID.getErrorCode(), message.substring(0, message.length() - 1));
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResult<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        StringBuilder builder = new StringBuilder();
+        e.getBindingResult().getFieldErrors()
+                .forEach(fieldError -> builder.append("参数名称: ")
+                        .append(fieldError.getField())
+                        .append(", 校验失败原因: ")
+                        .append(fieldError.getDefaultMessage())
+                        .append(", "));
+        String errMsg = builder.toString();
+        errMsg = errMsg.substring(0, errMsg.length() - 1);
+        log.error("参数校验失败: {}", errMsg);
+        return ApiResult.fail(CommonErrorEnum.PARAM_INVALID.getCode(), errMsg);
     }
 
-    /**
-     * validation参数校验异常
-     */
-    @ExceptionHandler(value = BindException.class)
-    public ApiResult bindException(BindException e) {
-        StringBuilder errorMsg = new StringBuilder();
-        e.getBindingResult().getFieldErrors().forEach(x -> errorMsg.append(x.getField()).append(x.getDefaultMessage()).append(","));
-        String message = errorMsg.toString();
-        log.info("validation parameters error！The reason is:{}", message);
-        return ApiResult.fail(CommonErrorEnum.PARAM_VALID.getErrorCode(), message.substring(0, message.length() - 1));
-    }
-
-    /**
-     * 处理空指针的异常
-     */
-    @ExceptionHandler(value = NullPointerException.class)
-    public ApiResult exceptionHandler(NullPointerException e) {
-        log.error("null point exception！The reason is: ", e);
+    @ExceptionHandler(Exception.class)
+    public ApiResult<?> handleException(Exception e) {
+        log.error("系统异常: ", e);
         return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
-    }
-
-    /**
-     * 未知异常
-     */
-    @ExceptionHandler(value = Exception.class)
-    public ApiResult systemExceptionHandler(Exception e) {
-        log.error("system exception！The reason is：{}", e.getMessage(), e);
-        return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
-    }
-
-    /**
-     * 自定义校验异常（如参数校验等）
-     */
-    @ExceptionHandler(value = BusinessException.class)
-    public ApiResult businessExceptionHandler(BusinessException e) {
-        log.info("business exception！The reason is：{}", e.getMessage(), e);
-        return ApiResult.fail(e.getErrorCode(), e.getMessage());
-    }
-
-    /**
-     * http请求方式不支持
-     */
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ApiResult<Void> handleException(HttpRequestMethodNotSupportedException e) {
-        log.error(e.getMessage(), e);
-        return ApiResult.fail(-1, String.format("不支持'%s'请求", e.getMethod()));
-    }
-
-    /**
-     * 限流异常
-     */
-    @ExceptionHandler(value = FrequencyControlException.class)
-    public ApiResult frequencyControlExceptionHandler(FrequencyControlException e) {
-        log.info("frequencyControl exception！The reason is：{}", e.getMessage(), e);
-        return ApiResult.fail(e.getErrorCode(), e.getMessage());
     }
 }

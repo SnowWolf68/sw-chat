@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 @Service
 public class LockService {
@@ -16,7 +15,7 @@ public class LockService {
     @Resource
     private RedissonClient redissonClient;
 
-    public <T> T excueteWithLock(String lockKey, int waitTime, TimeUnit timeUnit, Supplier<T> supplier){
+    public <T> T excueteWithLock(String lockKey, int waitTime, TimeUnit timeUnit, Supplier<T> supplier) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
         boolean result = false;
         try {
@@ -24,24 +23,35 @@ public class LockService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if(!result){
+        if (!result) {
             throw new BusinessException(CommonErrorEnum.LOCK_LIMIT);
         }
         try {
             return supplier.get();
-        }finally {
+        } finally {
             lock.unlock();
         }
     }
 
-    public <T> T excueteWithLock(String lockKey, Supplier<T> supplier){
+    public <T> T excueteWithLock(String lockKey, Supplier<T> supplier) throws Throwable {
         return excueteWithLock(lockKey, -1, TimeUnit.SECONDS, supplier);
     }
 
-    public <T> T excueteWithLock(String lockKey, Runnable runnable){
+    public <T> T excueteWithLock(String lockKey, Runnable runnable) throws Throwable {
         return excueteWithLock(lockKey, -1, TimeUnit.SECONDS, () -> {
             runnable.run();
             return null;
         });
+    }
+
+    @FunctionalInterface
+    public interface Supplier<T> {
+
+        /**
+         * Gets a result.
+         *
+         * @return a result
+         */
+        T get() throws Throwable;
     }
 }

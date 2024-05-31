@@ -15,12 +15,12 @@ class UserBackpackServiceImplTest {
     private UserBackpackServiceImpl userBackpackServiceImpl;
 
     @Test
-    void test1(){
+    void test1() throws Throwable {
         userBackpackServiceImpl.distributeItem(UID, 6L, IdempotentEnum.UID, UID + "");
     }
 
     @Test
-    void test2(){
+    void test2() throws Throwable {
         userBackpackServiceImpl.distributeItem(UID, 5L, IdempotentEnum.UID, UID + "");
     }
 }

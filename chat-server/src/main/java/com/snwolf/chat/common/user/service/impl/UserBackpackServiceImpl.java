@@ -7,11 +7,13 @@ import com.snwolf.chat.common.user.dao.UserBackpackDao;
 import com.snwolf.chat.common.user.domain.entity.UserBackpack;
 import com.snwolf.chat.common.user.domain.enums.IdempotentEnum;
 import com.snwolf.chat.common.user.service.IUserBackpackService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
 @Service
+@Slf4j
 public class UserBackpackServiceImpl implements IUserBackpackService {
 
     @Resource
@@ -21,7 +23,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
     private UserBackpackDao userBackpackDao;
 
     @Override
-    public void distributeItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) {
+    public void distributeItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) throws Throwable {
         String idempotent = getIdempotent(itemId, idempotentEnum, businessId);
         String redissonKey = String.format("distributeItem:%s", idempotent);
 
@@ -29,6 +31,7 @@ public class UserBackpackServiceImpl implements IUserBackpackService {
             UserBackpack userBackpack = userBackpackDao.getByIdempotent(uid, itemId, idempotent);
             if(ObjectUtil.isNotNull(userBackpack)){
                 // 之前获取过, 直接返回
+                log.info("用户:{}, 物品:{}, 已经发放过, idempotent:{}", uid, itemId, idempotent);
                 return;
             }
             // 这是第一次发放

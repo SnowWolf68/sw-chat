@@ -20,7 +20,7 @@ public interface UserService {
 
     UserInfoResp getUserInfo();
 
-    void modifyName(String name);
+    void modifyName(Long uid, String name);
 
     List<BadgesResp> badges(Long uid);
 

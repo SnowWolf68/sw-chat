@@ -19,5 +19,5 @@ public interface IUserBackpackService {
      * @param idempotentEnum: 幂等类型
      * @param businessId: 幂等唯一标识
      */
-    public void distributeItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId);
+    public void distributeItem(Long uid, Long itemId, IdempotentEnum idempotentEnum, String businessId) throws Throwable;
 }

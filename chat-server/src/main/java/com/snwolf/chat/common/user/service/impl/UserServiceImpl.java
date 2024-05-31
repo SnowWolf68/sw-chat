@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.user.service.impl;
 
+import com.snwolf.chat.common.common.annotation.RedissonLockAnno;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.dao.ItemConfigDao;
@@ -53,10 +54,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void modifyName(String name) {
+    @RedissonLockAnno(lockKey = "#uid")
+    public void modifyName(Long uid, String name) {
         User oldUser = userDao.getByName(name);
         AssertUtil.isEmpty(oldUser, "用户名已存在");
-        Long uid = RequestHolder.getUserInfo().getUid();
         UserBackpack modifyNameItem = userBackpackDao.getFirstUnusedItem(uid, ItemTypeEnum.MODIFY_NAME_CARD.getType());
         AssertUtil.isNotEmpty(modifyNameItem, "改名卡已用完");
         // 开始改名

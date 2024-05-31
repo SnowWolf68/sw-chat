@@ -43,7 +43,7 @@ public class UserController {
     @PutMapping("/name")
     @ApiOperation("用户改名")
     public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameReq modifyNameReq) {
-        userService.modifyName(modifyNameReq.getName());
+        userService.modifyName(RequestHolder.getUserInfo().getUid(), modifyNameReq.getName());
         return ApiResult.success();
     }
 

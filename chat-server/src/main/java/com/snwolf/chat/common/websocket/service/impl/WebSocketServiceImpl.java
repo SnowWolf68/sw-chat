@@ -5,11 +5,14 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.snwolf.chat.common.common.event.UserOnlineEvent;
 import com.snwolf.chat.common.user.dao.UserDao;
+import com.snwolf.chat.common.user.domain.entity.IpInfo;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.service.LoginService;
 import com.snwolf.chat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
+import com.snwolf.chat.common.websocket.service.NettyUtils;
 import com.snwolf.chat.common.websocket.service.WebSocketService;
 import com.snwolf.chat.common.websocket.service.adapter.WebSocketAdapter;
 import io.netty.channel.Channel;
@@ -17,11 +20,14 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -36,6 +42,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Resource
     private LoginService loginService;
+
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 管理所有在线用户的channel(登录态/游客态)
@@ -117,8 +126,11 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private void loginSuccess(Channel channel, String token, User user) {
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO(user.getId()));
-        // todo: 用户上线成功的事件
         sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+        // 发布用户上线成功的事件
+        user.setLastOptTime(LocalDateTime.now());
+        user.refreshIp(NettyUtils.getAttr(channel, NettyUtils.IP_KEY));
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
     }
 
     /**

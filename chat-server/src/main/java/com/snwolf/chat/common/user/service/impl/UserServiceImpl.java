@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.user.service.impl;
 
 import com.snwolf.chat.common.common.annotation.RedissonLockAnno;
+import com.snwolf.chat.common.common.event.UserRegisterEvent;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.dao.ItemConfigDao;
@@ -15,6 +16,7 @@ import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 import com.snwolf.chat.common.user.service.UserService;
 import com.snwolf.chat.common.user.service.adapter.UserAdapter;
 import com.snwolf.chat.common.user.service.cache.ItemCache;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +39,14 @@ public class UserServiceImpl implements UserService {
     @Resource
     private ItemConfigDao itemConfigDao;
 
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @Override
     @Transactional
     public Long register(User user) {
         userDao.save(user);
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, user));
         return user.getId();
     }
 

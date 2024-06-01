@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.websocket.service.adapter;
 
+import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
@@ -16,13 +17,14 @@ public class WebSocketAdapter {
         return response;
     }
 
-    public static WSBaseResp<?> buildResp(User user, String token) {
+    public static WSBaseResp<?> buildResp(User user, String token, boolean isAdmin) {
         WSBaseResp<WSLoginSuccess> response = new WSBaseResp<>();
         WSLoginSuccess wsLoginSuccess = WSLoginSuccess.builder()
                 .name(user.getName())
                 .avatar(user.getAvatar())
                 .token(token)
                 .uid(user.getId())
+                .power(isAdmin ? StatusEnum.STATUS_VALID.getStatus() : StatusEnum.STATUS_INVALID.getStatus())
                 .build();
         response.setData(wsLoginSuccess);
         response.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());

@@ -2,7 +2,6 @@ package com.snwolf.chat.common.user.dao;
 
 import com.snwolf.chat.common.user.domain.entity.Role;
 import com.snwolf.chat.common.user.mapper.RoleMapper;
-import com.snwolf.chat.common.user.service.IRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +14,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-06-01
  */
 @Service
-public class RoleDao extends ServiceImpl<RoleMapper, Role> implements IRoleService {
+public class RoleDao extends ServiceImpl<RoleMapper, Role> {
 
 }

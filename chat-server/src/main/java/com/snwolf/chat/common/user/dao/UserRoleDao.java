@@ -2,9 +2,10 @@ package com.snwolf.chat.common.user.dao;
 
 import com.snwolf.chat.common.user.domain.entity.UserRole;
 import com.snwolf.chat.common.user.mapper.UserRoleMapper;
-import com.snwolf.chat.common.user.service.IUserRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,6 +16,11 @@ import org.springframework.stereotype.Service;
  * @since 2024-06-01
  */
 @Service
-public class UserRoleDao extends ServiceImpl<UserRoleMapper, UserRole> implements IUserRoleService {
+public class UserRoleDao extends ServiceImpl<UserRoleMapper, UserRole> {
 
+    public List<UserRole> listByUid(Long uid) {
+        return lambdaQuery()
+                .eq(UserRole::getUid, uid)
+                .list();
+    }
 }

@@ -7,9 +7,10 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.snwolf.chat.common.common.event.UserOnlineEvent;
 import com.snwolf.chat.common.user.dao.UserDao;
-import com.snwolf.chat.common.user.domain.entity.IpInfo;
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.enums.RoleEnum;
 import com.snwolf.chat.common.user.service.LoginService;
+import com.snwolf.chat.common.user.service.RoleService;
 import com.snwolf.chat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
 import com.snwolf.chat.common.websocket.service.NettyUtils;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,6 +45,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Resource
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Resource
+    private RoleService roleService;
 
     /**
      * 管理所有在线用户的channel(登录态/游客态)
@@ -126,7 +129,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private void loginSuccess(Channel channel, String token, User user) {
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO(user.getId()));
-        sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+        sendMsg(channel, WebSocketAdapter.buildResp(user, token, roleService.hasPower(user.getId(), RoleEnum.ADMIN)));
         // 发布用户上线成功的事件
         user.setLastOptTime(LocalDateTime.now());
         user.refreshIp(NettyUtils.getAttr(channel, NettyUtils.IP_KEY));

@@ -17,10 +17,9 @@ import org.springframework.stereotype.Service;
 public class UserDao extends ServiceImpl<UserMapper, User> {
 
     public User getByOpenId(String openId) {
-        User user = lambdaQuery()
+        return lambdaQuery()
                 .eq(User::getOpenId, openId)
                 .one();
-        return user;
     }
 
     public User getByName(String name) {

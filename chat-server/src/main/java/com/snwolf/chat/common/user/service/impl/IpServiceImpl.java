@@ -12,6 +12,7 @@ import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.vo.resp.TaoBaoIpResp;
 import com.snwolf.chat.common.user.service.IpService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class IpServiceImpl implements IpService {
+public class IpServiceImpl implements IpService , DisposableBean {
 
     private static ExecutorService executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
@@ -99,6 +100,20 @@ public class IpServiceImpl implements IpService {
                     System.out.println("第" + finalI + "次成功, 目前耗时: " + Duration.between(begin, LocalDateTime.now()).toMillis());
                 }
             });
+        }
+    }
+
+    /**
+     * executor线程池的优雅停机配置
+     * @throws Exception
+     */
+    @Override
+    public void destroy() throws Exception {
+        executor.shutdown();
+        if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {//最多等30秒，处理不完就拉倒
+            if (log.isErrorEnabled()) {
+                log.error("Timed out while waiting for executor [{}] to terminate", executor);
+            }
         }
     }
 }

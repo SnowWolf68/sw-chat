@@ -5,6 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.snwolf.chat.common.common.config.ThreadPoolConfig;
 import com.snwolf.chat.common.common.event.UserOnlineEvent;
 import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.domain.entity.User;
@@ -23,6 +24,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,6 +50,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Resource
     private RoleService roleService;
+
+    @Resource(name = ThreadPoolConfig.WS_EXECUTOR)
+    private ThreadPoolTaskExecutor executor;
 
     /**
      * 管理所有在线用户的channel(登录态/游客态)
@@ -121,6 +126,11 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
         User user = userDao.getById(validUid);
         loginSuccess(channel, token, user);
+    }
+
+    @Override
+    public void sendMsgToAll(WSBaseResp<?> msg) {
+        ONLINE_WS_MAP.forEach((channel, wsChannelExtraDTO) -> executor.execute(() -> sendMsg(channel, msg)));
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> response) {

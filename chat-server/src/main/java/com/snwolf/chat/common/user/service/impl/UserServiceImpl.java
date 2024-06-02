@@ -1,15 +1,20 @@
 package com.snwolf.chat.common.user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.snwolf.chat.common.common.annotation.RedissonLockAnno;
+import com.snwolf.chat.common.common.event.UserBlackEvent;
 import com.snwolf.chat.common.common.event.UserRegisterEvent;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
+import com.snwolf.chat.common.user.dao.BlackDao;
 import com.snwolf.chat.common.user.dao.ItemConfigDao;
 import com.snwolf.chat.common.user.dao.UserBackpackDao;
 import com.snwolf.chat.common.user.dao.UserDao;
+import com.snwolf.chat.common.user.domain.entity.Black;
 import com.snwolf.chat.common.user.domain.entity.ItemConfig;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.entity.UserBackpack;
+import com.snwolf.chat.common.user.domain.enums.BlackTypeEnum;
 import com.snwolf.chat.common.user.domain.enums.ItemTypeEnum;
 import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
@@ -41,6 +46,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Resource
+    private BlackDao blackDao;
 
     @Override
     @Transactional
@@ -99,5 +107,37 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getById(uid);
         AssertUtil.notEqual(user.getItemId(), itemId, "您已经佩戴了该徽章, 请换一个佩戴吧");
         userDao.wearingBadge(uid, itemId);
+    }
+
+    /**
+     * 同时拉黑用户的id和ip
+     * @param id: 要拉黑的id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void black(Long id) {
+        // 拉黑该用户的id
+        Black black = Black.builder()
+                .type(BlackTypeEnum.UID.getType())
+                .target(id.toString())
+                .build();
+        blackDao.save(black);
+        // 拉黑该用户的ip
+        User targetUser = userDao.getById(id);
+        blackIp(targetUser.getIpInfo().getCreateIp());
+        blackIp(targetUser.getIpInfo().getLastIp());
+        // todo: 给前端通知一个拉黑事件
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this, targetUser));
+    }
+
+    private void blackIp(String ip) {
+        if(StrUtil.isBlank(ip)){
+            return;
+        }
+        Black black = Black.builder()
+                .type(BlackTypeEnum.IP.getType())
+                .target(ip)
+                .build();
+        blackDao.save(black);
     }
 }

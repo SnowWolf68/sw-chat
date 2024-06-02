@@ -1,11 +1,15 @@
 package com.snwolf.chat.common.user.controller;
 
+import com.snwolf.chat.common.common.domain.vo.req.BlackReq;
 import com.snwolf.chat.common.common.domain.vo.req.WearingBadgeReq;
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
+import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
+import com.snwolf.chat.common.user.domain.enums.RoleEnum;
 import com.snwolf.chat.common.user.domain.vo.req.ModifyNameReq;
 import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
+import com.snwolf.chat.common.user.service.RoleService;
 import com.snwolf.chat.common.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +38,9 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private RoleService roleService;
+
     @GetMapping("/userInfo")
     @ApiOperation("获取用户个人信息")
     public ApiResult<UserInfoResp> getUserInfo() {
@@ -57,6 +64,16 @@ public class UserController {
     @ApiOperation("佩戴徽章")
     public ApiResult<?> wearingBadge(@Valid @RequestBody WearingBadgeReq wearingBadgeReq){
         userService.wearingBagde(RequestHolder.getUserInfo().getUid(), wearingBadgeReq.getItemId());
+        return ApiResult.success();
+    }
+
+    @PostMapping("/black")
+    @ApiOperation("拉黑")
+    public ApiResult<?> black(@Valid @RequestBody BlackReq blackReq){
+        Long uid = RequestHolder.getUserInfo().getUid();
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.ADMIN);
+        AssertUtil.isTrue(hasPower, "无权限");
+        userService.black(blackReq.getId());
         return ApiResult.success();
     }
 }

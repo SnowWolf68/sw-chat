@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.user.dao;
 
+import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.mapper.UserMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,6 +40,13 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
         lambdaUpdate()
                 .eq(User::getId, uid)
                 .set(User::getItemId, itemId)
+                .update();
+    }
+
+    public void blackUserByUid(Long id) {
+        lambdaUpdate()
+                .eq(User::getId, id)
+                .set(User::getStatus, StatusEnum.STATUS_VALID.getStatus())
                 .update();
     }
 }

@@ -4,6 +4,7 @@ import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
+import com.snwolf.chat.common.websocket.domain.vo.response.WSBlack;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSLoginSuccess;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSLoginUrl;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
@@ -41,5 +42,15 @@ public class WebSocketAdapter {
         WSBaseResp<Object> response = new WSBaseResp<>();
         response.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
         return response;
+    }
+
+    public static WSBaseResp<?> buildBlack(User user) {
+        WSBaseResp<WSBlack> blackResp = new WSBaseResp<>();
+        blackResp.setType(WSRespTypeEnum.BLACK.getType());
+        WSBlack wsBlack = WSBlack.builder()
+                .uid(user.getId())
+                .build();
+        blackResp.setData(wsBlack);
+        return blackResp;
     }
 }

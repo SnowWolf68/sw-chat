@@ -25,4 +25,6 @@ public interface UserService {
     List<BadgesResp> badges(Long uid);
 
     void wearingBagde(Long uid, Long itemId);
+
+    void black(Long id);
 }

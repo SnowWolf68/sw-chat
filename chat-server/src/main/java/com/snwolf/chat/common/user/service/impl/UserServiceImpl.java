@@ -21,7 +21,9 @@ import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 import com.snwolf.chat.common.user.service.UserService;
 import com.snwolf.chat.common.user.service.adapter.UserAdapter;
 import com.snwolf.chat.common.user.service.cache.ItemCache;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Resource
@@ -121,7 +124,11 @@ public class UserServiceImpl implements UserService {
                 .type(BlackTypeEnum.UID.getType())
                 .target(id.toString())
                 .build();
-        blackDao.save(black);
+        try {
+            blackDao.save(black);
+        } catch (DuplicateKeyException e) {
+            log.info("该id: " + id + " 已经被拉黑过, 无需重复拉黑");
+        }
         // 拉黑该用户的ip
         User targetUser = userDao.getById(id);
         blackIp(targetUser.getIpInfo().getCreateIp());
@@ -138,6 +145,10 @@ public class UserServiceImpl implements UserService {
                 .type(BlackTypeEnum.IP.getType())
                 .target(ip)
                 .build();
-        blackDao.save(black);
+        try {
+            blackDao.save(black);
+        } catch (DuplicateKeyException e) {
+            log.info("该ip: " + ip + " 已经被拉黑过, 无需重复拉黑");
+        }
     }
 }

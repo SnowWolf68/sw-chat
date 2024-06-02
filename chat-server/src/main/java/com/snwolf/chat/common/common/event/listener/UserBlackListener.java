@@ -6,6 +6,7 @@ import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.enums.UserActiveStatusEnum;
 import com.snwolf.chat.common.user.service.IpService;
+import com.snwolf.chat.common.user.service.cache.UserCache;
 import com.snwolf.chat.common.websocket.service.WebSocketService;
 import com.snwolf.chat.common.websocket.service.adapter.WebSocketAdapter;
 import org.springframework.context.event.EventListener;
@@ -25,6 +26,9 @@ public class UserBlackListener {
     @Resource
     private UserDao userDao;
 
+    @Resource
+    private UserCache userCache;
+
 
     @Async
     @TransactionalEventListener(value = UserBlackEvent.class, phase = TransactionPhase.AFTER_COMMIT)
@@ -37,5 +41,16 @@ public class UserBlackListener {
     @TransactionalEventListener(value = UserBlackEvent.class, phase = TransactionPhase.AFTER_COMMIT)
     public void changeUserStatus(UserBlackEvent event) throws Throwable {
         userDao.blackUserByUid(event.getUser().getId());
+    }
+
+    /**
+     * 每次有新的人被拉黑之后, 清除之前拉黑的缓存
+     * @param event
+     * @throws Throwable
+     */
+    @Async
+    @TransactionalEventListener(value = UserBlackEvent.class, phase = TransactionPhase.AFTER_COMMIT)
+    public void evictBlackCache(UserBlackEvent event) throws Throwable {
+        userCache.evicateBlackMap();
     }
 }

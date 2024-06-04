@@ -1,5 +1,9 @@
 package com.snwolf.chat.common.user.service;
 
+import com.snwolf.chat.common.common.domain.vo.req.CursorPageBaseReq;
+import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
+import com.snwolf.chat.common.websocket.domain.vo.response.ChatMemberResp;
+
 /**
  * <p>
  * 用户联系人表 服务类
@@ -10,4 +14,5 @@ package com.snwolf.chat.common.user.service;
  */
 public interface UserFriendService {
 
+    CursorPageBaseResp<ChatMemberResp> frientList(Long uid, CursorPageBaseReq cursorPageBaseReq);
 }

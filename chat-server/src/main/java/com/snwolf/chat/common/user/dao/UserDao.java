@@ -1,10 +1,16 @@
 package com.snwolf.chat.common.user.dao;
 
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
+import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.entity.UserFriend;
 import com.snwolf.chat.common.user.mapper.UserMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>

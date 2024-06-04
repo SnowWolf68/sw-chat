@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.user.dao;
 
 import com.snwolf.chat.common.user.domain.entity.UserApply;
+import com.snwolf.chat.common.user.domain.enums.ApplyReadStatusEnum;
 import com.snwolf.chat.common.user.domain.enums.ApplyStatusEnum;
 import com.snwolf.chat.common.user.mapper.UserApplyMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,5 +24,12 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
                 .eq(UserApply::getTargetId, targetId)
                 .eq(UserApply::getStatus, ApplyStatusEnum.WAIT_APPROVAL.getCode())
                 .one();
+    }
+
+    public Integer getUnReadCount(Long targetId) {
+        return lambdaQuery()
+                .eq(UserApply::getTargetId, targetId)
+                .eq(UserApply::getReadStatus, ApplyReadStatusEnum.UNREAD.getCode())
+                .count();
     }
 }

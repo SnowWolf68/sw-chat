@@ -14,11 +14,13 @@ import com.snwolf.chat.common.user.service.LoginService;
 import com.snwolf.chat.common.user.service.RoleService;
 import com.snwolf.chat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
+import com.snwolf.chat.common.websocket.domain.vo.response.WSFriendApply;
 import com.snwolf.chat.common.websocket.service.NettyUtils;
 import com.snwolf.chat.common.websocket.service.WebSocketService;
 import com.snwolf.chat.common.websocket.service.adapter.WebSocketAdapter;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
@@ -30,9 +32,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@Slf4j
 public class WebSocketServiceImpl implements WebSocketService {
 
     @Resource
@@ -131,6 +136,19 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public void sendMsgToAll(WSBaseResp<?> msg) {
         ONLINE_WS_MAP.forEach((channel, wsChannelExtraDTO) -> executor.execute(() -> sendMsg(channel, msg)));
+    }
+
+    @Override
+    public void sendMsgToTargetId(WSBaseResp<WSFriendApply> wsFriendApplyWSBaseResp, Long targetId) {
+        Map<Long, Channel> idChannelMap = new HashMap<>();
+        ONLINE_WS_MAP.forEach((channel, wsChannelExtraDTO) -> {
+            idChannelMap.put(wsChannelExtraDTO.getUid(), channel);
+        });
+        if(idChannelMap.containsKey(targetId)){
+            sendMsg(idChannelMap.get(targetId), wsFriendApplyWSBaseResp);
+        }else{
+            log.info("targetId: {} 未上线, 无法进行在线推送", targetId);
+        }
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> response) {

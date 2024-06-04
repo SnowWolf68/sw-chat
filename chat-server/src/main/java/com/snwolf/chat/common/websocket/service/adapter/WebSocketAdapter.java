@@ -2,11 +2,9 @@ package com.snwolf.chat.common.websocket.service.adapter;
 
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.enums.ApplyTypeEnum;
 import com.snwolf.chat.common.websocket.domain.enums.WSRespTypeEnum;
-import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
-import com.snwolf.chat.common.websocket.domain.vo.response.WSBlack;
-import com.snwolf.chat.common.websocket.domain.vo.response.WSLoginSuccess;
-import com.snwolf.chat.common.websocket.domain.vo.response.WSLoginUrl;
+import com.snwolf.chat.common.websocket.domain.vo.response.*;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 
 public class WebSocketAdapter {
@@ -52,5 +50,16 @@ public class WebSocketAdapter {
                 .build();
         blackResp.setData(wsBlack);
         return blackResp;
+    }
+
+    public static WSBaseResp<WSFriendApply> buildUserApplyResp(Long uid, Integer count) {
+        WSFriendApply wsFriendApply = WSFriendApply.builder()
+                .uid(uid)
+                .unreadCount(count)
+                .build();
+        WSBaseResp<WSFriendApply> response = new WSBaseResp<>();
+        response.setType(WSRespTypeEnum.APPLY.getType());
+        response.setData(wsFriendApply);
+        return response;
     }
 }

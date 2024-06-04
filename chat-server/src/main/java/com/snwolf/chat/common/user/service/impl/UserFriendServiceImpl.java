@@ -2,6 +2,7 @@ package com.snwolf.chat.common.user.service.impl;
 
 import com.snwolf.chat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
+import com.snwolf.chat.common.common.event.UserApplyEvent;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.CursorUtils;
 import com.snwolf.chat.common.user.dao.UserApplyDao;
@@ -17,6 +18,7 @@ import com.snwolf.chat.common.user.service.UserFriendService;
 import com.snwolf.chat.common.user.service.adapter.MemberAdapter;
 import com.snwolf.chat.common.user.service.adapter.UserApplyAdapter;
 import com.snwolf.chat.common.websocket.domain.vo.response.ChatMemberResp;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +37,9 @@ public class UserFriendServiceImpl implements UserFriendService {
 
     @Resource
     private UserApplyDao userApplyDao;
+
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public CursorPageBaseResp<ChatMemberResp> frientList(Long uid, CursorPageBaseReq cursorPageBaseReq) {
@@ -82,5 +87,7 @@ public class UserFriendServiceImpl implements UserFriendService {
         // 可以进行好友申请
         UserApply userApply = UserApplyAdapter.buildApply(uid, friendApplyReq);
         userApplyDao.save(userApply);
+        // 申请事件推送给前端, 即给被申请的好友推送一条申请通知
+        applicationEventPublisher.publishEvent(new UserApplyEvent(this, userApply));
     }
 }

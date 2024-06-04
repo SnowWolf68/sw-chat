@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -45,5 +46,19 @@ public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
             log.error("游标翻页异常: " + e);
             return CursorPageBaseResp.empty();
         }
+    }
+
+    public List<UserFriend> getByFriends(Long uid, List<Long> uidList) {
+        return lambdaQuery()
+                .eq(UserFriend::getUid, uid)
+                .in(UserFriend::getFriendUid, uidList)
+                .list();
+    }
+
+    public UserFriend getByUidAndFriendUid(Long uid, Long targetUid) {
+        return lambdaQuery()
+                .eq(UserFriend::getUid, uid)
+                .eq(UserFriend::getFriendUid, targetUid)
+                .one();
     }
 }

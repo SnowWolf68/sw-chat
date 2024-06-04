@@ -1,8 +1,8 @@
 package com.snwolf.chat.common.user.dao;
 
 import com.snwolf.chat.common.user.domain.entity.UserApply;
+import com.snwolf.chat.common.user.domain.enums.ApplyStatusEnum;
 import com.snwolf.chat.common.user.mapper.UserApplyMapper;
-import com.snwolf.chat.common.user.service.UserApplyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,13 @@ import org.springframework.stereotype.Service;
  * @since 2024-06-04
  */
 @Service
-public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> implements UserApplyService {
+public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
 
+    public UserApply getByUidAndFriendUid(Long uid, Long targetId) {
+        return lambdaQuery()
+                .eq(UserApply::getUid, uid)
+                .eq(UserApply::getTargetId, targetId)
+                .eq(UserApply::getStatus, ApplyStatusEnum.WAIT_APPROVAL.getCode())
+                .one();
+    }
 }

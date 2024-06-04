@@ -1,10 +1,12 @@
 package com.snwolf.chat.common.user.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.snwolf.chat.common.common.domain.vo.req.CursorPageBaseReq;
+import com.snwolf.chat.common.common.domain.vo.req.PageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
+import com.snwolf.chat.common.common.domain.vo.resp.PageBaseResp;
 import com.snwolf.chat.common.common.event.UserApplyEvent;
 import com.snwolf.chat.common.common.utils.AssertUtil;
-import com.snwolf.chat.common.common.utils.CursorUtils;
 import com.snwolf.chat.common.user.dao.UserApplyDao;
 import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.dao.UserFriendDao;
@@ -13,16 +15,21 @@ import com.snwolf.chat.common.user.domain.entity.UserApply;
 import com.snwolf.chat.common.user.domain.entity.UserFriend;
 import com.snwolf.chat.common.user.domain.vo.req.FriendApplyReq;
 import com.snwolf.chat.common.user.domain.vo.req.FriendCheckReq;
+import com.snwolf.chat.common.user.domain.vo.resp.FriendApplyResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendCheckResp;
+import com.snwolf.chat.common.user.domain.vo.resp.FriendUnreadResp;
 import com.snwolf.chat.common.user.service.UserFriendService;
 import com.snwolf.chat.common.user.service.adapter.MemberAdapter;
 import com.snwolf.chat.common.user.service.adapter.UserApplyAdapter;
 import com.snwolf.chat.common.websocket.domain.vo.response.ChatMemberResp;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -89,5 +96,58 @@ public class UserFriendServiceImpl implements UserFriendService {
         userApplyDao.save(userApply);
         // 申请事件推送给前端, 即给被申请的好友推送一条申请通知
         applicationEventPublisher.publishEvent(new UserApplyEvent(this, userApply));
+    }
+
+    @Override
+    public FriendUnreadResp unreadCount(Long uid) {
+        // 查询user_apply表, 找当前用户为target_id, 并且状态为未读的记录的数量
+        Integer unReadCount = userApplyDao.getUnReadCount(uid);
+        return new FriendUnreadResp(unReadCount);
+    }
+
+    /**
+     * 这里的翻页就是普通的翻页, 即带有 当前页码 和 当前页大小 的分页查询
+     *
+     * @param uid
+     * @param request
+     * @return
+     */
+    @Override
+    public PageBaseResp<FriendApplyResp> page(Long uid, PageBaseReq request) {
+        // 分页查询当前用户的申请列表
+        Page<UserApply> applyPage = userApplyDao.friendApplyPage(uid, request.getPageNo(), request.getPageSize());
+        // 通过分页查询结果, 构造返回对象
+        List<Long> ids = applyPage.getRecords().stream()
+                .map(UserApply::getUid)
+                .collect(Collectors.toList());
+        List<User> userList = userDao.listByIds(ids);
+        Map<Long, User> userMap = userList.stream()
+                .collect(Collectors.toMap(User::getId, user -> user));
+        List<FriendApplyResp> friendApplyRespList = applyPage.getRecords().stream()
+                .map(apply -> {
+                    FriendApplyResp friendApplyResp = new FriendApplyResp();
+                    friendApplyResp.setApplyId(apply.getId());
+                    friendApplyResp.setUid(apply.getUid());
+                    friendApplyResp.setType(apply.getType());
+                    User user = userMap.get(apply.getUid());
+                    friendApplyResp.setName(user.getName());
+                    friendApplyResp.setAvatar(user.getAvatar());
+                    return friendApplyResp;
+                })
+                .collect(Collectors.toList());
+        // 将本页查询出来的所有未读数据都设置为已读
+        // 由于markRead方法加了事务, 并且markRead方法属于本地调用, 直接调用会导致事务失效, 因此这里需要取到代理对象, 然后进行调用
+        UserFriendService proxy = (UserFriendService) AopContext.currentProxy();
+        proxy.markRead(applyPage.getRecords());
+        return PageBaseResp.init(request.getPageNo(), request.getPageSize(), applyPage.getTotal(), friendApplyRespList);
+    }
+
+    @Override
+    @Transactional
+    public void markRead(List<UserApply> records) {
+        List<Long> ids = records.stream()
+                .map(UserApply::getId)
+                .collect(Collectors.toList());
+        userApplyDao.markReadByIds(ids);
     }
 }

@@ -2,6 +2,7 @@ package com.snwolf.chat.common.user.service.impl;
 
 import com.snwolf.chat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
+import com.snwolf.chat.common.common.utils.CursorUtils;
 import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.dao.UserFriendDao;
 import com.snwolf.chat.common.user.domain.entity.User;

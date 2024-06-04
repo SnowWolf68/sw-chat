@@ -26,7 +26,11 @@ public class MemberAdapter {
                 .map(UserFriend::getFriendUid)
                 .map(friendId -> {
                     ChatMemberResp chatMemberResp = BeanUtil.copyProperties(userMap.get(friendId), ChatMemberResp.class);
-                    chatMemberResp.setUid(friendId);
+                    // mock的数据有可能会出现user_friend表中有朋友关系, 但是user表中没有该好友的信息
+                    // 这里为了简便处理, 单独对friendId做一下非空判断
+                    if(userMap.get(friendId) != null){
+                        chatMemberResp.setUid(friendId);
+                    }
                     return chatMemberResp;
                 })
                 .collect(Collectors.toList());

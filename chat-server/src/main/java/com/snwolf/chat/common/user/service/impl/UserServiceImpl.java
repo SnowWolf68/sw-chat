@@ -25,7 +25,7 @@ import com.snwolf.chat.common.user.service.UserService;
 import com.snwolf.chat.common.user.service.adapter.UserAdapter;
 import com.snwolf.chat.common.user.service.cache.ItemCache;
 import com.snwolf.chat.common.user.service.cache.UserCache;
-import com.snwolf.chat.common.user.service.cache.UserSummaryCache;
+import com.snwolf.chat.common.user.service.cache.batchCacheWithFramework.UserSummaryCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
         List<Long> needIds = getNeedRefreshUids(summaryInfoReq);
         // 拿着这些id去查询用户信息, 由于有些id需要刷新, 有些id不需要刷新, 所以这里getBatch需要返回一个<id, summaryInfoDTO>的map
         // 这样便于后面封装返回值的时候, 拿着req中的每一条记录来这个map中查询, 如果有记录, 说明需要刷新, 反之说明不需要刷新
-        Map<Long, SummaryInfoDTO> summaryInfoDTOMap =  userSummaryCache.getBatch(needIds);
+        Map<Long, SummaryInfoDTO> summaryInfoDTOMap = userSummaryCache.getBatch(needIds);
         // 封装返回值
         return buildSummaryResp(summaryInfoReq, summaryInfoDTOMap);
     }

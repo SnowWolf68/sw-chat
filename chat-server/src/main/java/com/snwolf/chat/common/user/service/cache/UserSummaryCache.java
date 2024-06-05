@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @Date: 6/5/2024
  * @Description:
  */
-@Component
+//@Component
 public class UserSummaryCache {
 
     @Resource

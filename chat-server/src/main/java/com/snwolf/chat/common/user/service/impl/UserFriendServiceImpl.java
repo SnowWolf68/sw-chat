@@ -189,7 +189,7 @@ public class UserFriendServiceImpl implements UserFriendService {
         List<Long> ids = friendInfo.stream()
                 .map(UserFriend::getId)
                 .collect(Collectors.toList());
-        userDao.removeByIds(ids);
+        userFriendDao.removeByIds(ids);
         // 禁用这两个人对应的房间
         roomService.disableFriendRoom(ids);
     }

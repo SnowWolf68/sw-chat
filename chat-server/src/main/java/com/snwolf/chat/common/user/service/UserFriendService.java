@@ -6,12 +6,14 @@ import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.snwolf.chat.common.common.domain.vo.resp.PageBaseResp;
 import com.snwolf.chat.common.user.domain.entity.UserApply;
 import com.snwolf.chat.common.user.domain.vo.req.FriendApplyReq;
+import com.snwolf.chat.common.user.domain.vo.req.FriendApproveReq;
 import com.snwolf.chat.common.user.domain.vo.req.FriendCheckReq;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendApplyResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendCheckResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendUnreadResp;
 import com.snwolf.chat.common.websocket.domain.vo.response.ChatMemberResp;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -35,4 +37,6 @@ public interface UserFriendService {
     PageBaseResp<FriendApplyResp> page(Long uid, PageBaseReq request);
 
     void markRead(List<UserApply> records);
+
+    void applyApprove(Long uid, FriendApproveReq friendApproveReq);
 }

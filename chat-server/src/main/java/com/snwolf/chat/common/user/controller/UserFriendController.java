@@ -8,6 +8,7 @@ import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.snwolf.chat.common.common.domain.vo.resp.PageBaseResp;
 import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.domain.vo.req.FriendApplyReq;
+import com.snwolf.chat.common.user.domain.vo.req.FriendApproveReq;
 import com.snwolf.chat.common.user.domain.vo.req.FriendCheckReq;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendApplyResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendCheckResp;
@@ -72,6 +73,14 @@ public class UserFriendController {
     public ApiResult<PageBaseResp<FriendApplyResp>> page(@Valid PageBaseReq request){
         Long uid = RequestHolder.getUserInfo().getUid();
         return ApiResult.success(userFriendService.page(uid, request));
+    }
+
+    @PutMapping("/apply")
+    @ApiOperation("同意好友申请")
+    public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApproveReq friendApproveReq){
+        Long uid = RequestHolder.getUserInfo().getUid();
+        userFriendService.applyApprove(uid, friendApproveReq);
+        return ApiResult.success();
     }
 }
 

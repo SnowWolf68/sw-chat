@@ -52,4 +52,11 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
                 .in(UserApply::getId, ids)
                 .update();
     }
+
+    public void approve(Long id) {
+        lambdaUpdate()
+                .eq(UserApply::getId, id)
+                .set(UserApply::getStatus, ApplyStatusEnum.AGREE.getCode())
+                .update();
+    }
 }

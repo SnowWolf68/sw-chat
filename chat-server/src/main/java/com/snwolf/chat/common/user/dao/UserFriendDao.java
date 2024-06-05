@@ -9,6 +9,7 @@ import com.snwolf.chat.common.common.utils.CursorUtils;
 import com.snwolf.chat.common.user.domain.entity.UserFriend;
 import com.snwolf.chat.common.user.mapper.UserFriendMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.snwolf.chat.common.user.service.adapter.UserFriendAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -60,5 +61,12 @@ public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
                 .eq(UserFriend::getUid, uid)
                 .eq(UserFriend::getFriendUid, targetUid)
                 .one();
+    }
+
+    public void createFriend(Long uid, Long targetId) {
+        UserFriend friend1 = UserFriendAdapter.createFriend(uid, targetId);
+        UserFriend friend2 = UserFriendAdapter.createFriend(targetId, uid);
+        save(friend1);
+        save(friend2);
     }
 }

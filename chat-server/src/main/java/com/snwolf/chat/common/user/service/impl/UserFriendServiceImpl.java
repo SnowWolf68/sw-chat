@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.user.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.req.PageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -13,11 +14,14 @@ import com.snwolf.chat.common.user.dao.UserFriendDao;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.entity.UserApply;
 import com.snwolf.chat.common.user.domain.entity.UserFriend;
+import com.snwolf.chat.common.user.domain.enums.ApplyStatusEnum;
 import com.snwolf.chat.common.user.domain.vo.req.FriendApplyReq;
+import com.snwolf.chat.common.user.domain.vo.req.FriendApproveReq;
 import com.snwolf.chat.common.user.domain.vo.req.FriendCheckReq;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendApplyResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendCheckResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendUnreadResp;
+import com.snwolf.chat.common.user.service.RoomService;
 import com.snwolf.chat.common.user.service.UserFriendService;
 import com.snwolf.chat.common.user.service.adapter.MemberAdapter;
 import com.snwolf.chat.common.user.service.adapter.UserApplyAdapter;
@@ -28,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +53,9 @@ public class UserFriendServiceImpl implements UserFriendService {
 
     @Resource
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Resource
+    private RoomService roomService;
 
     @Override
     public CursorPageBaseResp<ChatMemberResp> frientList(Long uid, CursorPageBaseReq cursorPageBaseReq) {
@@ -149,5 +158,24 @@ public class UserFriendServiceImpl implements UserFriendService {
                 .map(UserApply::getId)
                 .collect(Collectors.toList());
         userApplyDao.markReadByIds(ids);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void applyApprove(Long uid, FriendApproveReq friendApproveReq) {
+        // 从申请表中找到对应的申请记录
+        UserApply userApply = userApplyDao.getById(friendApproveReq.getApplyId());
+        AssertUtil.isNotEmpty(userApply, "不存在申请记录");
+        // 判断申请记录中的targetId和当前用户uid是否一致
+        AssertUtil.equal(uid, userApply.getTargetId(), "不存在申请记录");
+        // 判断当前申请是否还是未同意状态
+        AssertUtil.equal(userApply.getStatus(), ApplyStatusEnum.WAIT_APPROVAL, "当前好友申请已同意");
+        // 将申请设置为已同意
+        userApplyDao.approve(userApply.getId());
+        // 创建好友关系, 往user_friend表中插入两条数据
+        userFriendDao.createFriend(userApply.getUid(), userApply.getTargetId());
+        // 创建两人的聊天房间
+        roomService.createFriendRoom(Arrays.asList(userApply.getUid(), userApply.getTargetId()));
+        // todo: 在聊天房间中发送一条打招呼的消息
     }
 }

@@ -51,12 +51,22 @@ public abstract class AbstractBatchStringRedisCache<R, T> implements BatchCache<
     protected abstract Map<T, R> load(List<T> keyList);
 
 
+    /**
+     *
+     * @param key: 缓存key中的参数, 需要调用子类重写的getKey(T key)方法获得真正的缓存key
+     * @return
+     */
     @Override
     public R get(T key) {
         Map<T, R> single = getBatch(Arrays.asList(key));
         return single.get(key);
     }
 
+    /**
+     *
+     * @param keyList: 缓存key中的参数列表, 需要调用子类重写的getKey(T key)方法获得真正的缓存key
+     * @return
+     */
     @Override
     public Map<T, R> getBatch(List<T> keyList) {
         // 从缓存中批量获取
@@ -89,11 +99,19 @@ public abstract class AbstractBatchStringRedisCache<R, T> implements BatchCache<
         return redisResultMap;
     }
 
+    /**
+     *
+     * @param key: 缓存key中的参数, 需要调用子类重写的getKey(T key) 方法获得真正的缓存key
+     */
     @Override
     public void delete(T key) {
         deleteBatch(Arrays.asList(key));
     }
 
+    /**
+     *
+     * @param keyList: 缓存key中的参数列表, 需要调用子类重写的getKey(T key) 方法获得真正的缓存key
+     */
     @Override
     public void deleteBatch(List<T> keyList) {
         List<String> redisKeyList = keyList.stream()

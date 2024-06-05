@@ -1,9 +1,10 @@
 package com.snwolf.chat.common.user.dao;
 
 import com.snwolf.chat.common.user.domain.entity.Room;
+import com.snwolf.chat.common.user.domain.enums.RoomTypeEnum;
 import com.snwolf.chat.common.user.mapper.RoomMapper;
-import com.snwolf.chat.common.user.service.IRoomService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.snwolf.chat.common.user.service.adapter.RoomAdapter;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +16,11 @@ import org.springframework.stereotype.Service;
  * @since 2024-06-05
  */
 @Service
-public class RoomDao extends ServiceImpl<RoomMapper, Room> implements IRoomService {
+public class RoomDao extends ServiceImpl<RoomMapper, Room> {
 
+    public Room createRoom(RoomTypeEnum roomTypeEnum) {
+        Room room = RoomAdapter.buildRoomByType(roomTypeEnum);
+        save(room);
+        return room;
+    }
 }

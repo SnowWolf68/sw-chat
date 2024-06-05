@@ -6,6 +6,10 @@ public class RedisKeyConstant {
 
     public static final String USER_TOKEN_STRING = "userToken:uid_%d";
 
+    public static final String USER_LAST_MODIFY_TIME_STRING = "userLastModifyTime:uid_%d";
+
+    public static final String USER_SUMMARY_STRING = "userSummary:uid_%d";
+
     public static String getKey(String key, Object... o){
         return BASE_KEY + String.format(key, o);
     }

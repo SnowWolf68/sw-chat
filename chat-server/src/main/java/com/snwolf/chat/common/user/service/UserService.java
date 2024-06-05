@@ -1,6 +1,8 @@
 package com.snwolf.chat.common.user.service;
 
+import com.snwolf.chat.common.user.domain.dto.SummaryInfoDTO;
 import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.vo.req.SummaryInfoReq;
 import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 
@@ -27,4 +29,6 @@ public interface UserService {
     void wearingBagde(Long uid, Long itemId);
 
     void black(Long id);
+
+    List<SummaryInfoDTO> getSummaryUserInfo(SummaryInfoReq summaryInfoReq);
 }

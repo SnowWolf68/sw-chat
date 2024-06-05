@@ -5,8 +5,10 @@ import com.snwolf.chat.common.common.domain.vo.req.WearingBadgeReq;
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
+import com.snwolf.chat.common.user.domain.dto.SummaryInfoDTO;
 import com.snwolf.chat.common.user.domain.enums.RoleEnum;
 import com.snwolf.chat.common.user.domain.vo.req.ModifyNameReq;
+import com.snwolf.chat.common.user.domain.vo.req.SummaryInfoReq;
 import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 import com.snwolf.chat.common.user.service.RoleService;
@@ -75,6 +77,12 @@ public class UserController {
         AssertUtil.isTrue(hasPower, "无权限");
         userService.black(blackReq.getId());
         return ApiResult.success();
+    }
+
+    @PostMapping("/public/summary/userInfo/batch")
+    @ApiOperation("刷新用户信息")
+    public ApiResult<List<SummaryInfoDTO>> getSummaryUserInfo(@Valid @RequestBody SummaryInfoReq summaryInfoReq){
+        return ApiResult.success(userService.getSummaryUserInfo(summaryInfoReq));
     }
 }
 

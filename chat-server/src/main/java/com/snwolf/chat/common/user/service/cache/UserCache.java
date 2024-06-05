@@ -1,5 +1,7 @@
 package com.snwolf.chat.common.user.service.cache;
 
+import com.snwolf.chat.common.common.constant.RedisKeyConstant;
+import com.snwolf.chat.common.common.utils.RedisUtils;
 import com.snwolf.chat.common.user.dao.BlackDao;
 import com.snwolf.chat.common.user.dao.UserRoleDao;
 import com.snwolf.chat.common.user.domain.entity.Black;
@@ -20,6 +22,19 @@ public class UserCache {
 
     @Resource
     private BlackDao blackDao;
+
+    /**
+     * 从redis中获取ids对应的用户的lastModifyTime
+     * @param ids
+     * @return
+     */
+    public static List<Long> getLastModifyTimeByIds(List<Long> ids) {
+        // 获取ids集合在redis中对应的Key
+        List<String> keys = ids.stream()
+                .map(id -> RedisKeyConstant.getKey(RedisKeyConstant.USER_LAST_MODIFY_TIME_STRING, id))
+                .collect(Collectors.toList());
+        return RedisUtils.mget(keys, Long.class);
+    }
 
     @Cacheable(cacheNames = "user", key = "'roles' + #uid")
     public Set<Long> getRoleSetByUid(Long uid) {

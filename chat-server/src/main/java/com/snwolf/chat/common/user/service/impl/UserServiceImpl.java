@@ -11,6 +11,7 @@ import com.snwolf.chat.common.user.dao.BlackDao;
 import com.snwolf.chat.common.user.dao.ItemConfigDao;
 import com.snwolf.chat.common.user.dao.UserBackpackDao;
 import com.snwolf.chat.common.user.dao.UserDao;
+import com.snwolf.chat.common.user.domain.dto.ItemInfoDTO;
 import com.snwolf.chat.common.user.domain.dto.SummaryInfoDTO;
 import com.snwolf.chat.common.user.domain.entity.Black;
 import com.snwolf.chat.common.user.domain.entity.ItemConfig;
@@ -18,10 +19,12 @@ import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.entity.UserBackpack;
 import com.snwolf.chat.common.user.domain.enums.BlackTypeEnum;
 import com.snwolf.chat.common.user.domain.enums.ItemTypeEnum;
+import com.snwolf.chat.common.user.domain.vo.req.ItemInfoReq;
 import com.snwolf.chat.common.user.domain.vo.req.SummaryInfoReq;
 import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
 import com.snwolf.chat.common.user.domain.vo.resp.UserInfoResp;
 import com.snwolf.chat.common.user.service.UserService;
+import com.snwolf.chat.common.user.service.adapter.ItemInfoAdapter;
 import com.snwolf.chat.common.user.service.adapter.UserAdapter;
 import com.snwolf.chat.common.user.service.cache.ItemCache;
 import com.snwolf.chat.common.user.service.cache.UserCache;
@@ -34,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +54,7 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserBackpackDao userBackpackDao;
 
-    @Resource
+    @Resource(name = "ItemCache")
     private ItemCache itemCache;
 
     @Resource
@@ -67,6 +71,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserSummaryCache userSummaryCache;
+
+    @Resource(name = "BatchFrameworkItemCache")
+    private com.snwolf.chat.common.user.service.cache.batchCacheWithFramework.ItemCache frameworkItemCache;
 
     @Override
     @Transactional
@@ -161,6 +168,28 @@ public class UserServiceImpl implements UserService {
         Map<Long, SummaryInfoDTO> summaryInfoDTOMap = userSummaryCache.getBatch(needIds);
         // 封装返回值
         return buildSummaryResp(summaryInfoReq, summaryInfoDTOMap);
+    }
+
+    @Override
+    public List<ItemInfoDTO> getItemInfo(ItemInfoReq itemInfoReq) {
+        // 简单实现, 由于徽章数目比较少, 因此这里首先获取到所有徽章信息, 然后再结合req中的lastModifyTime进行判断
+        List<Long> itemIdList = itemInfoReq.getReqList().stream()
+                .map(ItemInfoReq.InfoReq::getItemId)
+                .collect(Collectors.toList());
+        Map<Long, ItemConfig> itemMap = frameworkItemCache.getBatch(itemIdList);
+        return itemInfoReq.getReqList().stream()
+                .map(infoReq -> {
+                    ItemConfig itemConfig = itemMap.get(infoReq.getItemId());
+                    if (ObjectUtil.isNull(infoReq.getLastModifyTime()) ||
+                            (itemConfig.getUpdateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() > infoReq.getLastModifyTime())) {
+                        // 需要refresh
+                        return ItemInfoAdapter.buildItemInfo(itemConfig);
+                    } else {
+                        // 无需refresh
+                        return ItemInfoDTO.empty(infoReq.getItemId());
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private List<SummaryInfoDTO> buildSummaryResp(SummaryInfoReq request, Map<Long, SummaryInfoDTO> summaryInfoDTOMap) {

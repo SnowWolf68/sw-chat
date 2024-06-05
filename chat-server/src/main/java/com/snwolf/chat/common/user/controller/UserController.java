@@ -5,8 +5,10 @@ import com.snwolf.chat.common.common.domain.vo.req.WearingBadgeReq;
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.common.utils.RequestHolder;
+import com.snwolf.chat.common.user.domain.dto.ItemInfoDTO;
 import com.snwolf.chat.common.user.domain.dto.SummaryInfoDTO;
 import com.snwolf.chat.common.user.domain.enums.RoleEnum;
+import com.snwolf.chat.common.user.domain.vo.req.ItemInfoReq;
 import com.snwolf.chat.common.user.domain.vo.req.ModifyNameReq;
 import com.snwolf.chat.common.user.domain.vo.req.SummaryInfoReq;
 import com.snwolf.chat.common.user.domain.vo.resp.BadgesResp;
@@ -83,6 +85,12 @@ public class UserController {
     @ApiOperation("刷新用户信息")
     public ApiResult<List<SummaryInfoDTO>> getSummaryUserInfo(@Valid @RequestBody SummaryInfoReq summaryInfoReq){
         return ApiResult.success(userService.getSummaryUserInfo(summaryInfoReq));
+    }
+
+    @PostMapping("/public/badges/batch")
+    @ApiOperation("刷新徽章信息")
+    public ApiResult<List<ItemInfoDTO>> getItemInfo(@Valid @RequestBody ItemInfoReq itemInfoReq){
+        return ApiResult.success(userService.getItemInfo(itemInfoReq));
     }
 }
 

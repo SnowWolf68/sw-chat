@@ -178,4 +178,19 @@ public class UserFriendServiceImpl implements UserFriendService {
         roomService.createFriendRoom(Arrays.asList(userApply.getUid(), userApply.getTargetId()));
         // todo: 在聊天房间中发送一条打招呼的消息
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long uid, Long friendId) {
+        // 查询user_friend表, 找到这两条数据
+        List<UserFriend> friendInfo = userFriendDao.getAllByUidAndFriendUid(uid, friendId);
+        AssertUtil.isNotEmpty(friendInfo, "你们不是好友关系, 无法删除");
+        // 删除这两条数据
+        List<Long> ids = friendInfo.stream()
+                .map(UserFriend::getId)
+                .collect(Collectors.toList());
+        userDao.removeByIds(ids);
+        // 禁用这两个人对应的房间
+        roomService.disableFriendRoom(ids);
+    }
 }

@@ -29,7 +29,7 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
     public void restoreRoomFriend(Long id) {
         lambdaUpdate()
                 .eq(RoomFriend::getId, id)
-                .set(RoomFriend::getStatus, StatusEnum.STATUS_VALID.getStatus())
+                .set(RoomFriend::getStatus, StatusEnum.STATUS_INVALID.getStatus())
                 .update();
     }
 
@@ -38,5 +38,13 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
         RoomFriend roomFriend = RoomAdapter.buildRoom(id, uids);
         save(roomFriend);
         return roomFriend;
+    }
+
+    public void disableFriendRoom(List<Long> ids) {
+        String roomKey = RoomAdapter.buildRoomKey(ids);
+        lambdaUpdate()
+                .eq(RoomFriend::getRoomKey, roomKey)
+                .set(RoomFriend::getStatus, StatusEnum.STATUS_VALID.getStatus())
+                .update();
     }
 }

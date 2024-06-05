@@ -52,6 +52,11 @@ public class RoomServiceImpl implements RoomService {
 
     }
 
+    @Override
+    public void disableFriendRoom(List<Long> ids) {
+        roomFriendDao.disableFriendRoom(ids);
+    }
+
     /**
      * 恢复房间
      * @param oldRoomFriend

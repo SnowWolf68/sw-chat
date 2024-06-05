@@ -39,4 +39,6 @@ public interface UserFriendService {
     void markRead(List<UserApply> records);
 
     void applyApprove(Long uid, FriendApproveReq friendApproveReq);
+
+    void delete(Long uid, Long targetUid);
 }

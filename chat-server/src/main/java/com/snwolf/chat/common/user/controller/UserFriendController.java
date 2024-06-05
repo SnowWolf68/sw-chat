@@ -10,6 +10,7 @@ import com.snwolf.chat.common.common.utils.RequestHolder;
 import com.snwolf.chat.common.user.domain.vo.req.FriendApplyReq;
 import com.snwolf.chat.common.user.domain.vo.req.FriendApproveReq;
 import com.snwolf.chat.common.user.domain.vo.req.FriendCheckReq;
+import com.snwolf.chat.common.user.domain.vo.req.FriendDeleteReq;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendApplyResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendCheckResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendUnreadResp;
@@ -80,6 +81,14 @@ public class UserFriendController {
     public ApiResult<Void> applyApprove(@Valid @RequestBody FriendApproveReq friendApproveReq){
         Long uid = RequestHolder.getUserInfo().getUid();
         userFriendService.applyApprove(uid, friendApproveReq);
+        return ApiResult.success();
+    }
+
+    @DeleteMapping()
+    @ApiOperation("删除好友")
+    public ApiResult<Void> delete(@Valid @RequestBody FriendDeleteReq friendDeleteReq){
+        Long uid = RequestHolder.getUserInfo().getUid();
+        userFriendService.delete(uid, friendDeleteReq.getTargetUid());
         return ApiResult.success();
     }
 }

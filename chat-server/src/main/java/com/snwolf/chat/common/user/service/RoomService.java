@@ -20,4 +20,10 @@ public interface RoomService {
      * @return
      */
     RoomFriend createFriendRoom(List<Long> uids);
+
+    /**
+     * 禁用ids中对应两个好友的房间
+     * @param ids: 两个好友的id
+     */
+    void disableFriendRoom(List<Long> ids);
 }

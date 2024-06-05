@@ -69,4 +69,14 @@ public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
         save(friend1);
         save(friend2);
     }
+
+    public List<UserFriend> getAllByUidAndFriendUid(Long uid, Long friendId) {
+        return lambdaQuery()
+                .eq(UserFriend::getUid, uid)
+                .eq(UserFriend::getFriendUid, friendId)
+                .or()
+                .eq(UserFriend::getUid, friendId)
+                .eq(UserFriend::getFriendUid, uid)
+                .list();
+    }
 }

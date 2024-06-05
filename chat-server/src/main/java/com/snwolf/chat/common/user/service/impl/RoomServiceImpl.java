@@ -39,7 +39,7 @@ public class RoomServiceImpl implements RoomService {
         // 拼接room_key
         String roomKey = RoomAdapter.buildRoomKey(uids);
         // 判断这个房间之前是否被创建过
-        RoomFriend oldRoomFriend = roomFriendDao.getByRoomKey(roomKey)
+        RoomFriend oldRoomFriend = roomFriendDao.getByRoomKey(roomKey);
         if(ObjectUtil.isNotNull(oldRoomFriend)){
             // 如果之前创建过(恢复好友场景), 那么直接恢复
             restoreRoomFriend(oldRoomFriend);

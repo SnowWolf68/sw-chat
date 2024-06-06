@@ -1,12 +1,10 @@
 package com.snwolf.chat.common.chat.service.strategy.msg;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.ImgMsgDTO;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
-import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -32,10 +30,9 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
      * 图片类型的消息体body是ImgMsgDTO类型, 需要保存在message表的extra字段中
      */
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
-        ImgMsgDTO imgBody = BeanUtil.toBean(request.getBody(), ImgMsgDTO.class);
+    public void saveMsg(Message msg, ImgMsgDTO body) {
         MessageExtra extra = new MessageExtra();
-        extra.setImgMsgDTO(imgBody);
+        extra.setImgMsgDTO(body);
         Message message = new Message();
         message.setId(msg.getId());
         message.setExtra(extra);

@@ -1,12 +1,15 @@
 package com.snwolf.chat.common.chat.service.strategy.msg;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
+import com.snwolf.chat.common.chat.service.MessageAdapter;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
 
 /**
@@ -17,6 +20,9 @@ import java.lang.reflect.ParameterizedType;
  * @param <T> : 消息体的类型
  */
 public abstract class AbstractMsgHandler<T> {
+
+    @Resource
+    private MessageDao messageDao;
 
     Class<?> messageClass;
 
@@ -43,28 +49,50 @@ public abstract class AbstractMsgHandler<T> {
      */
     abstract MessageTypeEnum getMsgType();
 
-    /**
-     * 校验子类消息类型中使用注解添加的校验规则, 例如@NotNull
-     * @param chatMessageReq: 前端传过来的消息对象, chatMessageReq.getBody()得到的就是要校验的消息体
-     */
-    public void check(ChatMessageReq chatMessageReq){
-        T msgBody = (T) BeanUtil.toBean(chatMessageReq.getBody(), messageClass);
-        AssertUtil.allCheckValidateThrow(msgBody);
-    }
-
 
     /**
      * 子类选择性重写
      * <p>子类添加额外的校验规则
      */
-    public void checkExtra(){}
+    protected void checkExtra(T body, Long roomId, Long uid){}
 
     /**
      * 需子类重写
      * <p>在消息保存的时候, 采取两段式保存, 先保存消息基础信息到message表中, 然后再保存不同类型的消息体到消息表中
      * @param msg: 消息基础信息, 之前调用save方法保存到数据库中的对象(这个对象中只是消息的基础信息, 没有消息体的信息)
-     * @param request: 这里我们主要关注的是request中的消息体body, 我们需要将这个body保存到消息表中
-     *               其中, 这个body包括content和extra两类信息, 在saveMsg方法中, content和extra两类信息我们都需要保存
+     * @param body: 消息体对象, 这个对象是已经转换成了子类中具体消息体类型的对象
      */
-    public abstract void saveMsg(Message msg, ChatMessageReq request);
+    public abstract void saveMsg(Message msg, T body);
+
+    /**
+     * 校验并保存消息
+     *
+     * @param chatMessageReq: 前端传过来的消息内容
+     * @param uid:            发送人uid
+     */
+    public void checkAndSave(ChatMessageReq chatMessageReq, Long uid) {
+        // 校验消息实体类上的注解
+        T msgBody = toBean(chatMessageReq.getBody());
+        AssertUtil.allCheckValidateThrow(msgBody);
+        // 子类拓展校验
+        checkExtra(msgBody, chatMessageReq.getRoomId(), uid);
+        // 统一保存
+        Message baseMessage = MessageAdapter.buildMessageWithoutBody(uid, chatMessageReq);
+        messageDao.save(baseMessage);
+        // 子类保存消息体
+        saveMsg(baseMessage, msgBody);
+    }
+
+    /**
+     * 如果body是String类型, 那么使用BeanUtil.toBean()方法无法正确得到String类型的对象, 因此这里需要重写toBean方法
+     * <p>用来兼容body为String类型的情况
+     * @param body
+     * @return
+     */
+    private T toBean(Object body){
+        if(messageClass.isAssignableFrom(body.getClass())){
+            return (T) body;
+        }
+        return (T) BeanUtil.toBean(body, messageClass);
+    }
 }

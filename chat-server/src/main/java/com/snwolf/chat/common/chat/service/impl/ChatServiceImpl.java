@@ -1,10 +1,8 @@
 package com.snwolf.chat.common.chat.service.impl;
 
 import com.snwolf.chat.common.chat.dao.MessageDao;
-import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.service.ChatService;
-import com.snwolf.chat.common.chat.service.MessageAdapter;
 import com.snwolf.chat.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.snwolf.chat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +29,7 @@ public class ChatServiceImpl implements ChatService {
         checkRoom(uid, chatMessageReq.getRoomId());
         // 获取消息对应的handler处理器对象
         AbstractMsgHandler<?> handler = MsgHandlerFactory.getStrategy(chatMessageReq.getMsgType());
-        // 校验消息体中注解标明的检验条件
-        handler.check(chatMessageReq);
-        // 分两次保存消息
-        Message message = MessageAdapter.buildMessageWithoutBody(uid, chatMessageReq);
-        messageDao.save(message);
-        handler.saveMsg(message, chatMessageReq);
+        handler.checkAndSave(chatMessageReq, uid);
     }
 
     /**

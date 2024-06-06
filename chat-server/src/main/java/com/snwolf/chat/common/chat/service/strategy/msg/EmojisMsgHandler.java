@@ -1,13 +1,10 @@
 package com.snwolf.chat.common.chat.service.strategy.msg;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.EmojisMsgDTO;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
-import com.snwolf.chat.common.chat.domain.entity.msg.VideoMsgDTO;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
-import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,14 +26,10 @@ public class EmojisMsgHandler extends AbstractMsgHandler<EmojisMsgDTO> {
         return MessageTypeEnum.EMOJI;
     }
 
-    /**
-     * 语音类型消息的消息体是SoundMsgDTO类型, 需要保存在message表的extra字段中
-     */
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
-        EmojisMsgDTO emojisBody = BeanUtil.toBean(request.getBody(), EmojisMsgDTO.class);
+    public void saveMsg(Message msg, EmojisMsgDTO body) {
         MessageExtra extra = new MessageExtra();
-        extra.setEmojisMsgDTO(emojisBody);
+        extra.setEmojisMsgDTO(body);
         Message message = new Message();
         message.setId(msg.getId());
         message.setExtra(extra);

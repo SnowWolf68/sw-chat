@@ -1,12 +1,10 @@
 package com.snwolf.chat.common.chat.service.strategy.msg;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
 import com.snwolf.chat.common.chat.domain.entity.msg.SoundMsgDTO;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
-import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -32,10 +30,9 @@ public class SoundMsgHandler extends AbstractMsgHandler<SoundMsgDTO> {
      * 语音类型消息的消息体是SoundMsgDTO类型, 需要保存在message表的extra字段中
      */
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
-        SoundMsgDTO soundBody = BeanUtil.toBean(request.getBody(), SoundMsgDTO.class);
+    public void saveMsg(Message msg, SoundMsgDTO body) {
         MessageExtra extra = new MessageExtra();
-        extra.setSoundMsgDTO(soundBody);
+        extra.setSoundMsgDTO(body);
         Message message = new Message();
         message.setId(msg.getId());
         message.setExtra(extra);

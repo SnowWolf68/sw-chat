@@ -33,10 +33,10 @@ public class SystemMsgHandler extends AbstractMsgHandler<Object>{
      * <p>系统类型消息不携带extra字段, 因此只需要保存content字段即可
      */
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
+    public void saveMsg(Message msg, Object body) {
         Message message = new Message();
         message.setId(msg.getId());
-        message.setContent((String) request.getBody());
+        message.setContent((String) body);
         messageDao.updateById(message);
     }
 }

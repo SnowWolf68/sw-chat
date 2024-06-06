@@ -33,10 +33,9 @@ public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO> {
      * 语音类型消息的消息体是SoundMsgDTO类型, 需要保存在message表的extra字段中
      */
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
-        VideoMsgDTO videoBody = BeanUtil.toBean(request.getBody(), VideoMsgDTO.class);
+    public void saveMsg(Message msg, VideoMsgDTO body) {
         MessageExtra extra = new MessageExtra();
-        extra.setVideoMsgDTO(videoBody);
+        extra.setVideoMsgDTO(body);
         Message message = new Message();
         message.setId(msg.getId());
         message.setExtra(extra);

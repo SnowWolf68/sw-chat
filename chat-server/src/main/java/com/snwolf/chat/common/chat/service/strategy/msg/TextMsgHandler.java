@@ -4,7 +4,6 @@ import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
-import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,11 +30,10 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
     /**
      * 文本类型的消息体需要保存在content中, 并且文本类型的消息也有可能携带extra, 因此content和extra我们都需要保存
      * @param msg: 消息基础信息, 之前调用save方法保存到数据库中的对象(这个对象中只是消息的基础信息, 没有消息体的信息)
-     * @param request: 这里我们主要关注的是request中的消息体body, 我们需要将这个body保存到消息表中
-     *               其中, 这个body包括content和extra两类信息, 在saveMsg方法中, content和extra两类信息我们都需要保存
+     * @param body: 文本消息的消息体
      */
     @Override
-    public void saveMsg(Message msg, ChatMessageReq request) {
+    public void saveMsg(Message msg, Object body) {
         Message msgBody = new Message();
         // 注意msg中可能会携带extra, 但是在第一阶段的保存中, 没有将extra保存到message表中, 因此这里我们需要保存msg中的extra
         // 注意msg.getExtra()有可能为null
@@ -45,7 +43,7 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
         msgBody.setExtra(extra);
         // todo: 文本类型的消息体其实也包括了艾特内容, 回复内容,
         //  后续需要将文本类型的消息也做一层封装, 但是这里为了处理简单, 我们假设文本类型的消息体只是String类型, 所以这里直接强转body为String
-        msgBody.setContent((String) request.getBody());
+        msgBody.setContent((String) body);
         messageDao.updateById(msgBody);
     }
 }

@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.domain.enums;
+package com.snwolf.chat.common.chat.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

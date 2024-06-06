@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.domain.entity;
+package com.snwolf.chat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -6,24 +6,21 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
-
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 单聊房间表
+ * 会话列表
  * </p>
  *
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
- * @since 2024-06-05
+ * @since 2024-06-06
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("room_friend")
-@Builder
-public class RoomFriend implements Serializable {
+@TableName("contact")
+public class Contact implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,34 +31,34 @@ public class RoomFriend implements Serializable {
     private Long id;
 
     /**
+     * uid
+     */
+    @TableField("uid")
+    private Long uid;
+
+    /**
      * 房间id
      */
     @TableField("room_id")
     private Long roomId;
 
     /**
-     * uid1（更小的uid）
+     * 阅读到的时间
      */
-    @TableField("uid1")
-    private Long uid1;
+    @TableField("read_time")
+    private LocalDateTime readTime;
 
     /**
-     * uid2（更大的uid）
+     * 会话内消息最后更新的时间(只有普通会话需要维护，全员会话不需要维护)
      */
-    @TableField("uid2")
-    private Long uid2;
+    @TableField("active_time")
+    private LocalDateTime activeTime;
 
     /**
-     * 房间key由两个uid拼接，先做排序uid1_uid2
+     * 会话最新消息id
      */
-    @TableField("room_key")
-    private String roomKey;
-
-    /**
-     * 房间状态 0正常 1禁用(删好友了禁用)
-     */
-    @TableField("status")
-    private Integer status;
+    @TableField("last_msg_id")
+    private Long lastMsgId;
 
     /**
      * 创建时间

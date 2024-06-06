@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.controller;
+package com.snwolf.chat.common.chat.controller;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;

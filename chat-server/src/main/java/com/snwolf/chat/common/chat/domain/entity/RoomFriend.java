@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.domain.entity;
+package com.snwolf.chat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -6,12 +6,14 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 群聊房间表
+ * 单聊房间表
  * </p>
  *
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -19,8 +21,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("room_group")
-public class RoomGroup implements Serializable {
+@TableName("room_friend")
+@Builder
+public class RoomFriend implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,28 +40,28 @@ public class RoomGroup implements Serializable {
     private Long roomId;
 
     /**
-     * 群名称
+     * uid1（更小的uid）
      */
-    @TableField("name")
-    private String name;
+    @TableField("uid1")
+    private Long uid1;
 
     /**
-     * 群头像
+     * uid2（更大的uid）
      */
-    @TableField("avatar")
-    private String avatar;
+    @TableField("uid2")
+    private Long uid2;
 
     /**
-     * 额外信息（根据不同类型房间有不同存储的东西）
+     * 房间key由两个uid拼接，先做排序uid1_uid2
      */
-    @TableField("ext_json")
-    private String extJson;
+    @TableField("room_key")
+    private String roomKey;
 
     /**
-     * 逻辑删除(0-正常,1-删除)
+     * 房间状态 0正常 1禁用(删好友了禁用)
      */
-    @TableField("delete_status")
-    private Integer deleteStatus;
+    @TableField("status")
+    private Integer status;
 
     /**
      * 创建时间

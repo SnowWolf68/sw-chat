@@ -2,11 +2,11 @@ package com.snwolf.chat.common.user.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.snwolf.chat.common.common.utils.AssertUtil;
-import com.snwolf.chat.common.user.dao.RoomDao;
-import com.snwolf.chat.common.user.dao.RoomFriendDao;
-import com.snwolf.chat.common.user.domain.entity.Room;
-import com.snwolf.chat.common.user.domain.entity.RoomFriend;
-import com.snwolf.chat.common.user.domain.enums.RoomTypeEnum;
+import com.snwolf.chat.common.chat.dao.RoomDao;
+import com.snwolf.chat.common.chat.dao.RoomFriendDao;
+import com.snwolf.chat.common.chat.domain.entity.Room;
+import com.snwolf.chat.common.chat.domain.entity.RoomFriend;
+import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
 import com.snwolf.chat.common.user.service.RoomService;
 import com.snwolf.chat.common.user.service.adapter.RoomAdapter;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.snwolf.chat.common.user.service;
 
-import com.snwolf.chat.common.user.domain.entity.RoomGroup;
+import com.snwolf.chat.common.chat.domain.entity.RoomGroup;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

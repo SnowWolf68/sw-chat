@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.domain.entity;
+package com.snwolf.chat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;

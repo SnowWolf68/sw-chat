@@ -1,9 +1,9 @@
 package com.snwolf.chat.common.user.service.adapter;
 
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
-import com.snwolf.chat.common.user.domain.entity.Room;
-import com.snwolf.chat.common.user.domain.entity.RoomFriend;
-import com.snwolf.chat.common.user.domain.enums.RoomTypeEnum;
+import com.snwolf.chat.common.chat.domain.entity.Room;
+import com.snwolf.chat.common.chat.domain.entity.RoomFriend;
+import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
 
 import java.util.List;
 import java.util.stream.Collectors;

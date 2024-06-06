@@ -1,7 +1,7 @@
-package com.snwolf.chat.common.user.dao;
+package com.snwolf.chat.common.chat.dao;
 
-import com.snwolf.chat.common.user.domain.entity.Message;
-import com.snwolf.chat.common.user.mapper.MessageMapper;
+import com.snwolf.chat.common.chat.domain.entity.Message;
+import com.snwolf.chat.common.chat.mapper.MessageMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

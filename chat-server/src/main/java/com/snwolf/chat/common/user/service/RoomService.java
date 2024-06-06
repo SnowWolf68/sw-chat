@@ -1,6 +1,6 @@
 package com.snwolf.chat.common.user.service;
 
-import com.snwolf.chat.common.user.domain.entity.RoomFriend;
+import com.snwolf.chat.common.chat.domain.entity.RoomFriend;
 
 import java.util.List;
 

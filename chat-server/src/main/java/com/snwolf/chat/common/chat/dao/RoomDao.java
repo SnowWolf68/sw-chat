@@ -1,8 +1,8 @@
-package com.snwolf.chat.common.user.dao;
+package com.snwolf.chat.common.chat.dao;
 
-import com.snwolf.chat.common.user.domain.entity.Room;
-import com.snwolf.chat.common.user.domain.enums.RoomTypeEnum;
-import com.snwolf.chat.common.user.mapper.RoomMapper;
+import com.snwolf.chat.common.chat.domain.entity.Room;
+import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
+import com.snwolf.chat.common.chat.mapper.RoomMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.snwolf.chat.common.user.service.adapter.RoomAdapter;
 import org.springframework.stereotype.Service;

@@ -1,8 +1,5 @@
 package com.snwolf.chat.common.user.service;
 
-import com.snwolf.chat.common.user.domain.entity.RoomFriend;
-import com.baomidou.mybatisplus.extension.service.IService;
-
 /**
  * <p>
  * 单聊房间表 服务类

@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.domain.entity;
+package com.snwolf.chat.common.chat.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -11,16 +11,16 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 消息表
+ * 群聊房间表
  * </p>
  *
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
- * @since 2024-06-06
+ * @since 2024-06-05
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("message")
-public class Message implements Serializable {
+@TableName("room_group")
+public class RoomGroup implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,52 +31,34 @@ public class Message implements Serializable {
     private Long id;
 
     /**
-     * 会话表id
+     * 房间id
      */
     @TableField("room_id")
     private Long roomId;
 
     /**
-     * 消息发送者uid
+     * 群名称
      */
-    @TableField("from_uid")
-    private Long fromUid;
+    @TableField("name")
+    private String name;
 
     /**
-     * 消息内容
+     * 群头像
      */
-    @TableField("content")
-    private String content;
+    @TableField("avatar")
+    private String avatar;
 
     /**
-     * 回复的消息内容
+     * 额外信息（根据不同类型房间有不同存储的东西）
      */
-    @TableField("reply_msg_id")
-    private Long replyMsgId;
+    @TableField("ext_json")
+    private String extJson;
 
     /**
-     * 消息状态 0正常 1删除
+     * 逻辑删除(0-正常,1-删除)
      */
-    @TableField("status")
-    private Integer status;
-
-    /**
-     * 与回复的消息间隔多少条
-     */
-    @TableField("gap_count")
-    private Integer gapCount;
-
-    /**
-     * 消息类型 1正常文本 2.撤回消息
-     */
-    @TableField("type")
-    private Integer type;
-
-    /**
-     * 扩展信息
-     */
-    @TableField("extra")
-    private String extra;
+    @TableField("delete_status")
+    private Integer deleteStatus;
 
     /**
      * 创建时间

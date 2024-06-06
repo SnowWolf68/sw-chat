@@ -1,6 +1,6 @@
-package com.snwolf.chat.common.user.mapper;
+package com.snwolf.chat.common.chat.mapper;
 
-import com.snwolf.chat.common.user.domain.entity.RoomGroup;
+import com.snwolf.chat.common.chat.domain.entity.RoomGroup;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

@@ -2,7 +2,7 @@ package com.snwolf.chat.common.chat.dao;
 
 import com.snwolf.chat.common.chat.domain.entity.RoomGroup;
 import com.snwolf.chat.common.chat.mapper.RoomGroupMapper;
-import com.snwolf.chat.common.user.service.IRoomGroupService;
+import com.snwolf.chat.common.chat.service.IRoomGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

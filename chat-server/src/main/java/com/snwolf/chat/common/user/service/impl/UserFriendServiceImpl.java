@@ -1,7 +1,6 @@
 package com.snwolf.chat.common.user.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.common.domain.vo.req.CursorPageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.req.PageBaseReq;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -21,7 +20,7 @@ import com.snwolf.chat.common.user.domain.vo.req.FriendCheckReq;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendApplyResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendCheckResp;
 import com.snwolf.chat.common.user.domain.vo.resp.FriendUnreadResp;
-import com.snwolf.chat.common.user.service.RoomService;
+import com.snwolf.chat.common.chat.service.RoomService;
 import com.snwolf.chat.common.user.service.UserFriendService;
 import com.snwolf.chat.common.user.service.adapter.MemberAdapter;
 import com.snwolf.chat.common.user.service.adapter.UserApplyAdapter;
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

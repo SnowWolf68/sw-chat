@@ -7,7 +7,7 @@ import com.snwolf.chat.common.chat.dao.RoomFriendDao;
 import com.snwolf.chat.common.chat.domain.entity.Room;
 import com.snwolf.chat.common.chat.domain.entity.RoomFriend;
 import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
-import com.snwolf.chat.common.user.service.RoomService;
+import com.snwolf.chat.common.chat.service.RoomService;
 import com.snwolf.chat.common.user.service.adapter.RoomAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

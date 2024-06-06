@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.service;
+package com.snwolf.chat.common.chat.service;
 
 import com.snwolf.chat.common.chat.domain.entity.RoomGroup;
 import com.baomidou.mybatisplus.extension.service.IService;

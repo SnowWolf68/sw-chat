@@ -1,4 +1,4 @@
-package com.snwolf.chat.common.user.service;
+package com.snwolf.chat.common.chat.service;
 
 /**
  * <p>

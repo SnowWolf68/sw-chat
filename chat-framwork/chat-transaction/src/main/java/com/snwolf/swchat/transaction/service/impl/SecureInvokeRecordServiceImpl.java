@@ -12,6 +12,7 @@ import com.snwolf.swchat.transaction.service.SecureInvokeRecordService;
 import com.snwolf.swchat.transaction.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -42,6 +43,17 @@ public class SecureInvokeRecordServiceImpl implements SecureInvokeRecordService 
      * 异步调用目标方法所需要的线程池, 在构造方法中传入
      */
     private final Executor executor;
+
+    /**
+     * 重试方法, 每隔5秒执行一次
+     */
+    @Scheduled(cron = "*/5 * * * * ?")
+    public void retry(){
+        // 从数据库中找出所有需要重试的record
+        List<SecureInvokeRecord> waitRetryList = secureInvokeRecordDao.getWaitRetryRecords();
+        // 异步重试
+        waitRetryList.forEach(this::doAsyncInvoke);
+    }
 
     @Override
     public void invoke(SecureInvokeRecord secureInvokeRecord, boolean async) {

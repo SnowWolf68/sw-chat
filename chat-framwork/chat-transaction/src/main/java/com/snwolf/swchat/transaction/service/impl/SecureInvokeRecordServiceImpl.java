@@ -18,6 +18,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -102,8 +103,13 @@ public class SecureInvokeRecordServiceImpl implements SecureInvokeRecordService 
             method.invoke(bean, args);
             // 如果执行成功, 更新执行状态, 直接删除本地消息表中的记录
             removeRecord(record.getId());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("SecureInvokeService invoke fail: ", e);
+            String errMsg;
+            // java.lang.reflect.InvocationTargetException
+//            if(e.getClass().isAssignableFrom(InvocationTargetException.class)){
+//                errMsg = ((InvocationTargetException) e).getTargetException().getT
+//            }
             // 重试
             retryRecord(record, e.getMessage());
         }

@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableScheduling   // 开始Spring Task定时任务
 @MapperScan(basePackageClasses = SecureInvokeRecordMapper.class)
-@Import({SecureInvokeAspect.class, SecureInvokeDTO.class})
+@Import({SecureInvokeAspect.class, SecureInvokeRecordDao.class})
 public class TransactionAutoConfiguration {
 
     /**

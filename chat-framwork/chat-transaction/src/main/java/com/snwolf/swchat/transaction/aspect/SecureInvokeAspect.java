@@ -2,7 +2,8 @@ package com.snwolf.swchat.transaction.aspect;
 
 import cn.hutool.json.JSONUtil;
 import com.snwolf.swchat.transaction.annotation.SecureInvoke;
- import com.snwolf.swchat.transaction.domain.dto.SecureInvokeDTO;
+import com.snwolf.swchat.transaction.domain.SecureInvokeStatusEnum;
+import com.snwolf.swchat.transaction.domain.dto.SecureInvokeDTO;
 import com.snwolf.swchat.transaction.domain.entity.SecureInvokeRecord;
 import com.snwolf.swchat.transaction.service.SecureInvokeRecordService;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,8 @@ public class SecureInvokeAspect {
         SecureInvokeRecord secureInvokeRecord = SecureInvokeRecord.builder()
                 .secureInvokeJson(JSONUtil.toJsonStr(secureInvokeDTO))
                 .maxRetryTimes(secureInvoke.maxRetryTimes())
+                .status(SecureInvokeStatusEnum.WAIT.getStatus())
+                .retryTimes(0)
                 .build();
         secureInvokeRecordService.invoke(secureInvokeRecord, async);
         // 这里并不是真正执行目标方法中的业务, 而是将目标方法的所有信息存到本地消息表中, 使用定时任务来执行目标方法

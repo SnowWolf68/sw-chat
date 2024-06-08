@@ -41,3 +41,12 @@ wx:
         aesKey: ${swchat.wx.aesKey} # 接口配置里的EncodingAESKey值
 jwt:
   secret: ${swchat.jwt.secret}
+rocketmq:
+  name-server: ${swchat.rocketmq.name-server}
+  consumer:
+    access-key: ${swchat.rocketmq.consumer.access-key}
+    secret-key: ${swchat.rocketmq.consumer.secret-key}
+  producer:
+    group: rocket-produce # 生产者组
+    access-key: ${swchat.rocketmq.producer.access-key}
+    secret-key: ${swchat.rocketmq.producer.secret-key}

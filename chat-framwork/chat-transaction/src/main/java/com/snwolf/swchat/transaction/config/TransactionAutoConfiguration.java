@@ -5,6 +5,7 @@ import com.snwolf.swchat.transaction.configurer.SecureInvokeConfigurer;
 import com.snwolf.swchat.transaction.dao.SecureInvokeRecordDao;
 import com.snwolf.swchat.transaction.domain.dto.SecureInvokeDTO;
 import com.snwolf.swchat.transaction.mapper.SecureInvokeRecordMapper;
+import com.snwolf.swchat.transaction.service.MQProducer;
 import com.snwolf.swchat.transaction.service.impl.SecureInvokeRecordServiceImpl;
 import io.micrometer.core.lang.Nullable;
 import org.mybatis.spring.annotation.MapperScan;
@@ -69,5 +70,14 @@ public class TransactionAutoConfiguration {
     @Bean
     public SecureInvokeRecordServiceImpl getSecureInvokeService(SecureInvokeRecordDao dao) {
         return new SecureInvokeRecordServiceImpl(dao, executor);
+    }
+
+    /**
+     * 注入MQProducer的bean对象
+     * @return
+     */
+    @Bean
+    public MQProducer getMQProducer() {
+        return new MQProducer();
     }
 }

@@ -18,7 +18,8 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
-import java.lang.reflect.InvocationTargetException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,8 +53,13 @@ public class SecureInvokeRecordServiceImpl implements SecureInvokeRecordService 
     public void retry(){
         // 从数据库中找出所有需要重试的record
         List<SecureInvokeRecord> waitRetryList = secureInvokeRecordDao.getWaitRetryRecords();
+        // log
+        log.info("定时任务: 从数据库中找出所有需要重试的record, 需要重试的任务数: " + waitRetryList.size());
         // 异步重试
-        waitRetryList.forEach(this::doAsyncInvoke);
+        waitRetryList.forEach(record -> {
+            log.info("重试任务: recordId: " + record.getId() + " 当前重试次数: " + record.getRetryTimes());
+            doAsyncInvoke(record);
+        });
     }
 
     @Override
@@ -72,6 +78,7 @@ public class SecureInvokeRecordServiceImpl implements SecureInvokeRecordService 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
+                log.info("消息入库后第一次调用目标方法");
                 if (async) {
                     // 异步调用
                     doAsyncInvoke(secureInvokeRecord);
@@ -102,16 +109,18 @@ public class SecureInvokeRecordServiceImpl implements SecureInvokeRecordService 
             // 执行目标方法
             method.invoke(bean, args);
             // 如果执行成功, 更新执行状态, 直接删除本地消息表中的记录
+            // log
+            log.info("recordId: " + record.getId() + " 执行成功, 删除这条记录");
             removeRecord(record.getId());
         } catch (Throwable e) {
             log.error("SecureInvokeService invoke fail: ", e);
-            String errMsg;
-            // java.lang.reflect.InvocationTargetException
-//            if(e.getClass().isAssignableFrom(InvocationTargetException.class)){
-//                errMsg = ((InvocationTargetException) e).getTargetException().getT
-//            }
+            // 得到String类型的异常调用栈信息
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTraceStr = sw.toString();
             // 重试
-            retryRecord(record, e.getMessage());
+            retryRecord(record, stackTraceStr);
         }
     }
 
@@ -135,6 +144,8 @@ public class SecureInvokeRecordServiceImpl implements SecureInvokeRecordService 
         if (retryTimes > record.getMaxRetryTimes()) {
             // 超过最大重试次数, 无需重试, 直接将失败的信息记录在本地消息表中
             updateRecord.setStatus(SecureInvokeStatusEnum.FAILED.getStatus());
+            // log
+            log.info("recordId: " + record.getId() + " 超过最大重试次数");
         } else {
             // 没超过最大重试次数, 将更新后的record信息更新到本地消息表中
             updateRecord.setRetryTimes(retryTimes);

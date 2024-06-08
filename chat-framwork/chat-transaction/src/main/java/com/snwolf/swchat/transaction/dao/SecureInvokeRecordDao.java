@@ -32,7 +32,7 @@ public class SecureInvokeRecordDao extends ServiceImpl<SecureInvokeRecordMapper,
      */
     public List<SecureInvokeRecord> getWaitRetryRecords() {
         return lambdaQuery()
-                .eq(SecureInvokeRecord::getStatus, SecureInvokeStatusEnum.WAIT)
+                .eq(SecureInvokeRecord::getStatus, SecureInvokeStatusEnum.WAIT.getStatus())
                 .lt(SecureInvokeRecord::getNextRetryTime, LocalDateTime.now())
                 .lt(SecureInvokeRecord::getCreateTime, LocalDateTime.now().minusMinutes(INTERVAL_MINUTES))
                 .list();

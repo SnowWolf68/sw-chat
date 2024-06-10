@@ -1,12 +1,8 @@
 package com.snwolf.chat.common.chat.service.impl;
 
-import com.snwolf.chat.common.chat.dao.GroupMemberDao;
-import com.snwolf.chat.common.chat.dao.MessageDao;
-import com.snwolf.chat.common.chat.dao.RoomFriendDao;
-import com.snwolf.chat.common.chat.domain.entity.GroupMember;
-import com.snwolf.chat.common.chat.domain.entity.Message;
-import com.snwolf.chat.common.chat.domain.entity.Room;
-import com.snwolf.chat.common.chat.domain.entity.RoomFriend;
+import cn.hutool.core.collection.CollectionUtil;
+import com.snwolf.chat.common.chat.dao.*;
+import com.snwolf.chat.common.chat.domain.entity.*;
 import com.snwolf.chat.common.chat.domain.enums.RoomFriendStatusEnum;
 import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
@@ -18,14 +14,18 @@ import com.snwolf.chat.common.chat.service.cache.RoomGroupCache;
 import com.snwolf.chat.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.snwolf.chat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
+import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.snwolf.chat.common.common.event.MessageSendEvent;
 import com.snwolf.chat.common.common.utils.AssertUtil;
+import com.snwolf.chat.common.user.domain.enums.BlackTypeEnum;
+import com.snwolf.chat.common.user.service.cache.UserCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -55,6 +55,15 @@ public class ChatServiceImpl implements ChatService {
     @Resource
     private GroupMemberDao groupMemberDao;
 
+    @Resource
+    private ContactDao contactDao;
+
+    @Resource
+    private RoomDao roomDao;
+
+    @Resource
+    private UserCache userCache;
+
     @Override
     public Long sendMsg(Long uid, ChatMessageReq chatMessageReq) {
         // 判断是否有权限在当前房间中发言
@@ -69,29 +78,71 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public ChatMessageResp buildChatMessageResp(Long msgId, Long receiveUid) {
-        ChatMessageResp.MessageMark messageMark = getMessageMark(msgId, receiveUid);
-        ChatMessageResp.Message message = getMessage(msgId, messageMark);
-        ChatMessageResp.UserInfo userInfo = getUserInfo(msgId);
-        return ChatMessageResp.builder()
-                .message(message)
-                .fromUser(userInfo)
-                .build();
+    public ChatMessageResp buildSingleChatMessageResp(Long msgId, Long receiveUid) {
+        return CollectionUtil.getFirst(buildChatMessageRespBatchWithMsgIds(Collections.singletonList(msgId), receiveUid));
     }
 
-    private ChatMessageResp.UserInfo getUserInfo(Long msgId) {
-        Message message = messageDao.getById(msgId);
+    @Override
+    public CursorPageBaseResp<ChatMessageResp> getCursorPage(ChatMessagePageReq request, Long receiveUid) {
+        // 获取当前用户能够看到的当前房间的最后一条消息id(如果是全员群, 则不做判断), 适用于当前receiveUid被移除群聊之后的场景
+        // lastMsgId有可能为null
+        Long lastMsgId = getLastMsgId(request.getRoomId(), receiveUid);
+        // 游标翻页查询
+        CursorPageBaseResp<Message> cursorPageResult = messageDao.cursorPageQuery(request, receiveUid, lastMsgId);
+        // 过滤掉被拉黑用户的消息
+        Set<String> blackSet = userCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
+        cursorPageResult.getList().removeIf(message -> blackSet.contains(message.getFromUid().toString()));
+        // 将Message对象转换成前端需要的ChatMessageResp对象
+        List<ChatMessageResp> chatMessageRespList = buildChatMessageRespBatch(cursorPageResult.getList(), receiveUid);
+        // 返回
+        return CursorPageBaseResp.init(cursorPageResult, chatMessageRespList);
+    }
+
+    private List<ChatMessageResp> buildChatMessageRespBatchWithMsgIds(List<Long> messageIdList, Long receiveUid){
+        List<Message> messageList = messageDao.listByIds(messageIdList);
+        return buildChatMessageRespBatch(messageList, receiveUid);
+    }
+
+    /**
+     * 批量的将Message转换成ChatMessageResp
+     * @param messageList
+     * @param receiveUid
+     * @return
+     */
+    private List<ChatMessageResp> buildChatMessageRespBatch(List<Message> messageList, Long receiveUid){
+        return messageList.stream()
+                .map(message -> {
+                    ChatMessageResp.MessageMark messageMark = getMessageMark(message, receiveUid);
+                    ChatMessageResp.Message chatMessage = getMessage(message, messageMark);
+                    ChatMessageResp.UserInfo userInfo = getUserInfo(message);
+                    return ChatMessageResp.builder()
+                            .message(chatMessage)
+                            .fromUser(userInfo)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Long getLastMsgId(Long roomId, Long receiveUid) {
+        // 如果是全员群, 则不做判断
+        Room room = roomDao.getById(roomId);
+        if(room.isHotRoom()){
+            return null;
+        }
+        return contactDao.getLastMsgId(roomId, receiveUid);
+    }
+
+    private ChatMessageResp.UserInfo getUserInfo(Message message) {
         return ChatMessageResp.UserInfo
                 .builder()
                 .uid(message.getFromUid())
                 .build();
     }
 
-    private ChatMessageResp.Message getMessage(Long msgId, ChatMessageResp.MessageMark messageMark) {
-        Message message = messageDao.getById(msgId);
+    private ChatMessageResp.Message getMessage(Message message, ChatMessageResp.MessageMark messageMark) {
         AbstractMsgHandler<?> handler = MsgHandlerFactory.getStrategy(message.getType());
         return ChatMessageResp.Message.builder()
-                .id(msgId)
+                .id(message.getId())
                 .roomId(message.getRoomId())
                 .sendTime(message.getCreateTime())
                 .type(message.getType())
@@ -100,7 +151,7 @@ public class ChatServiceImpl implements ChatService {
                 .build();
     }
 
-    private ChatMessageResp.MessageMark getMessageMark(Long msgId, Long receiveUid) {
+    private ChatMessageResp.MessageMark getMessageMark(Message message, Long receiveUid) {
         return ChatMessageResp.MessageMark
                 .builder()
                 .likeCount(0)

@@ -1,17 +1,16 @@
 package com.snwolf.chat.common.chat.controller;
 
+import com.snwolf.chat.common.chat.domain.entity.ChatMessagePageReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.service.ChatService;
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
+import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.snwolf.chat.common.common.utils.RequestHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -38,6 +37,12 @@ public class ChatController {
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq chatMessageReq){
         Long uid = RequestHolder.getUserInfo().getUid();
         Long msgId = chatService.sendMsg(uid, chatMessageReq);
-        return ApiResult.success(chatService.buildChatMessageResp(msgId, uid));
+        return ApiResult.success(chatService.buildSingleChatMessageResp(msgId, uid));
+    }
+
+    @GetMapping("/public/msg/page")
+    @ApiOperation("消息列表")
+    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request){
+        return ApiResult.success(chatService.getCursorPage(request, RequestHolder.getUserInfo().getUid()));
     }
 }

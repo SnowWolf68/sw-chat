@@ -1,7 +1,9 @@
 package com.snwolf.chat.common.chat.service;
 
+import com.snwolf.chat.common.chat.domain.entity.ChatMessagePageReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
+import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -18,11 +20,8 @@ public interface ChatService {
      */
     Long sendMsg(Long uid, ChatMessageReq chatMessageReq);
 
-    /**
-     * 构建给前端的消息返回对象
-     * @param msgId
-     * @param receiveUid: 接收消息的uid
-     * @return
-     */
-    ChatMessageResp buildChatMessageResp(Long msgId, Long receiveUid);
+
+    CursorPageBaseResp<ChatMessageResp> getCursorPage(ChatMessagePageReq request, Long receiveUid);
+
+    ChatMessageResp buildSingleChatMessageResp(Long msgId, Long receiveUid);
 }

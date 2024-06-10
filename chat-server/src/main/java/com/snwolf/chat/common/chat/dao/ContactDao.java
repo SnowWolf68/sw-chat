@@ -22,4 +22,12 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
     public void refreshOrCreate(Long roomId, List<Long> uidList, LocalDateTime createTime, Long msgId) {
         baseMapper.refreshOrCreate(roomId, uidList, createTime, msgId);
     }
+
+    public Long getLastMsgId(Long roomId, Long receiveUid) {
+        Contact contact = lambdaQuery()
+                .eq(Contact::getRoomId, roomId)
+                .eq(Contact::getUid, receiveUid)
+                .one();
+        return contact.getLastMsgId();
+    }
 }

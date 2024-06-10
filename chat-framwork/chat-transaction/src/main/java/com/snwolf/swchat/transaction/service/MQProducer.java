@@ -17,11 +17,11 @@ public class MQProducer {
     private RocketMQTemplate rocketMQTemplate;
 
     public void sendMsg(String topic, Object body){
-        rocketMQTemplate.convertAndSend(body);
+        rocketMQTemplate.convertAndSend(topic, body);
     }
 
     @SecureInvoke
     public void secureSendMsg(String topic, Object body){
-        rocketMQTemplate.convertAndSend(body);
+        rocketMQTemplate.convertAndSend(topic, body);
     }
 }

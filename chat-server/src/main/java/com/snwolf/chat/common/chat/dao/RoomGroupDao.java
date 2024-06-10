@@ -6,6 +6,8 @@ import com.snwolf.chat.common.chat.service.IRoomGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 群聊房间表 服务实现类
@@ -17,4 +19,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomGroupDao extends ServiceImpl<RoomGroupMapper, RoomGroup> implements IRoomGroupService {
 
+    public List<RoomGroup> listByRoomIds(List<Long> roomIdList) {
+        return lambdaQuery()
+                .in(RoomGroup::getRoomId, roomIdList)
+                .list();
+    }
 }

@@ -5,6 +5,9 @@ import com.snwolf.chat.common.chat.mapper.ContactMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * <p>
  * 会话列表 服务实现类
@@ -16,4 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
 
+    public void refreshOrCreate(Long roomId, List<Long> uidList, LocalDateTime createTime, Long msgId) {
+        baseMapper.refreshOrCreate(roomId, uidList, createTime, msgId);
+    }
 }

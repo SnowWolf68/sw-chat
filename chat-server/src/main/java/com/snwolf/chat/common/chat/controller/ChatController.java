@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.chat.controller;
 
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
+import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.service.ChatService;
 import com.snwolf.chat.common.common.domain.vo.resp.ApiResult;
 import com.snwolf.chat.common.common.utils.RequestHolder;
@@ -31,14 +32,12 @@ public class ChatController {
     @Resource
     private ChatService chatService;
 
-    /**
-     * todo: 发送消息的方法需要返回消息对象, 便于当前用户的前端展示, 但是这里暂时不进行实现
-     */
+
     @PostMapping("/msg")
     @ApiOperation("发送消息")
-    public ApiResult<Void> sendMsg(@Valid @RequestBody ChatMessageReq chatMessageReq){
+    public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq chatMessageReq){
         Long uid = RequestHolder.getUserInfo().getUid();
-        chatService.sendMsg(uid, chatMessageReq);
-        return ApiResult.success();
+        ChatMessageResp chatMessageResp = chatService.sendMsg(uid, chatMessageReq);
+        return ApiResult.success(chatMessageResp);
     }
 }

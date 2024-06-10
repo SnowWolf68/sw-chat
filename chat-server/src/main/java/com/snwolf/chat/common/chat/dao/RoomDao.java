@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.snwolf.chat.common.user.service.adapter.RoomAdapter;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * <p>
  * 房间表 服务实现类
@@ -22,5 +24,14 @@ public class RoomDao extends ServiceImpl<RoomMapper, Room> {
         Room room = RoomAdapter.buildRoomByType(roomTypeEnum);
         save(room);
         return room;
+    }
+
+    public void updateActiveTimeAndLastMsgId(Long id, Long msgId, LocalDateTime createTime) {
+        lambdaUpdate()
+                .eq(Room::getId, id)
+                // todo: 使用乐观锁保证 哪怕收到消息的顺序和发送不一致, 这里的activeTime也不会更新的比原来更小
+                .set(Room::getActiveTime, createTime)
+                .set(Room::getLastMsgId, msgId)
+                .update();
     }
 }

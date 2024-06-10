@@ -7,9 +7,11 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 
+import com.snwolf.chat.common.chat.domain.enums.HotFlagEnum;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.minidev.json.annotate.JsonIgnore;
 
 /**
  * <p>
@@ -41,6 +43,7 @@ public class Room implements Serializable {
 
     /**
      * 是否全员展示 0否 1是
+     * @note: 是否是全员群
      */
     @TableField("hot_flag")
     private Integer hotFlag;
@@ -75,5 +78,13 @@ public class Room implements Serializable {
     @TableField("update_time")
     private LocalDateTime updateTime;
 
+    /**
+     * 内聚方法: 判断是否是全员群
+     * @return
+     */
+    @JsonIgnore
+    public boolean isHotRoom(){
+        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
+    }
 
 }

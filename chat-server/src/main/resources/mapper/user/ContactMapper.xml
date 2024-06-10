@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.snwolf.chat.common.chat.mapper.ContactMapper">
 
+    <insert id="refreshOrCreate">
+        insert into contact(`room_id`,`uid`,`last_msg_id`,`active_time`)
+        values
+        <foreach collection="uidList" item="uid" separator=",">
+            (#{roomId},#{uid},#{msgId},#{createTime})
+        </foreach>
+        on DUPLICATE KEY UPDATE
+        `last_msg_id`=VALUES(msgId),
+        `active_time`=VALUES(createTime)
+    </insert>
 </mapper>

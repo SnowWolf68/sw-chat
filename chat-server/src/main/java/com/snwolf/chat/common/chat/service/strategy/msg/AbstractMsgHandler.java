@@ -5,7 +5,7 @@ import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
-import com.snwolf.chat.common.chat.service.MessageAdapter;
+import com.snwolf.chat.common.chat.service.adapter.MessageAdapter;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 
 import javax.annotation.PostConstruct;
@@ -69,8 +69,9 @@ public abstract class AbstractMsgHandler<T> {
      *
      * @param chatMessageReq: 前端传过来的消息内容
      * @param uid:            发送人uid
+     * @return : 消息id(msgId)
      */
-    public void checkAndSave(ChatMessageReq chatMessageReq, Long uid) {
+    public Long checkAndSave(ChatMessageReq chatMessageReq, Long uid) {
         // 校验消息实体类上的注解
         T msgBody = toBean(chatMessageReq.getBody());
         AssertUtil.allCheckValidateThrow(msgBody);
@@ -81,6 +82,7 @@ public abstract class AbstractMsgHandler<T> {
         messageDao.save(baseMessage);
         // 子类保存消息体
         saveMsg(baseMessage, msgBody);
+        return baseMessage.getId();
     }
 
     /**

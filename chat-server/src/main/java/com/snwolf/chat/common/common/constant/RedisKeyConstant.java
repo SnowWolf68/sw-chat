@@ -10,6 +10,12 @@ public class RedisKeyConstant {
 
     public static final String USER_SUMMARY_STRING = "userSummary:uid_%d";
 
+    public static final String ROOM_INFO_STRING = "roomInfo:roomId_%d";
+
+    public static final String ROOM_GROUP_STRING = "roomGroup:roomId_%d";
+
+    public static final String ROOM_ACTIVE_TIME_STRING = "roomActiveTime";
+
     public static String getKey(String key, Object... o){
         return BASE_KEY + String.format(key, o);
     }

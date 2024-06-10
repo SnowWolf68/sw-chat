@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.websocket.service;
 
+import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSFriendApply;
 import io.netty.channel.Channel;
@@ -29,4 +30,6 @@ public interface WebSocketService {
      * @param targetId
      */
     void sendMsgToTargetId(WSBaseResp<WSFriendApply> wsFriendApplyWSBaseResp, Long targetId);
+
+    void pushMsgToAll(WSBaseResp<?> chatMessageRespWSBaseResp);
 }

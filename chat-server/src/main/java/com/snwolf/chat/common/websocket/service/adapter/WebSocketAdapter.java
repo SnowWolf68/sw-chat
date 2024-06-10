@@ -1,5 +1,6 @@
 package com.snwolf.chat.common.websocket.service.adapter;
 
+import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.enums.ApplyTypeEnum;
@@ -60,6 +61,13 @@ public class WebSocketAdapter {
         WSBaseResp<WSFriendApply> response = new WSBaseResp<>();
         response.setType(WSRespTypeEnum.APPLY.getType());
         response.setData(wsFriendApply);
+        return response;
+    }
+
+    public static WSBaseResp<ChatMessageResp> buildChatMessageResp(ChatMessageResp chatMessageResp) {
+        WSBaseResp<ChatMessageResp> response = new WSBaseResp<>();
+        response.setType(WSRespTypeEnum.MESSAGE.getType());
+        response.setData(chatMessageResp);
         return response;
     }
 }

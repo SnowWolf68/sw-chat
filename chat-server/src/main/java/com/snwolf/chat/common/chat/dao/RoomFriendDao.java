@@ -47,4 +47,10 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
                 .set(RoomFriend::getStatus, StatusEnum.STATUS_VALID.getStatus())
                 .update();
     }
+
+    public RoomFriend getByRoomId(Long roomId) {
+        return lambdaQuery()
+                .eq(RoomFriend::getRoomId, roomId)
+                .one();
+    }
 }

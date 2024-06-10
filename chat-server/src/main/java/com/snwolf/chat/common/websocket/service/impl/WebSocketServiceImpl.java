@@ -5,6 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.common.config.ThreadPoolConfig;
 import com.snwolf.chat.common.common.event.UserOnlineEvent;
 import com.snwolf.chat.common.user.dao.UserDao;
@@ -149,6 +150,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         }else{
             log.info("targetId: {} 未上线, 无法进行在线推送", targetId);
         }
+    }
+
+    @Override
+    public void pushMsgToAll(WSBaseResp<?> chatMessageRespWSBaseResp) {
+        // 推送给所有在线用户
+        ONLINE_WS_MAP.keySet().forEach(channel -> sendMsg(channel, chatMessageRespWSBaseResp));
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> response) {

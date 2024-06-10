@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.common.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -266,7 +267,9 @@ public class RedisUtils {
         if (Objects.isNull(list)) {
             return new ArrayList<>();
         }
-        return list.stream().map(o -> toBeanOrNull(o, tClass)).collect(Collectors.toList());
+//        return list.stream().map(o -> toBeanOrNull(o, tClass)).collect(Collectors.toList());
+        return list.stream()
+                .map(o -> o == null ? null : JSONUtil.toBean(o, tClass)).collect(Collectors.toList());
     }
 
     static <T> T toBeanOrNull(String json, Class<T> tClass) {
@@ -278,7 +281,8 @@ public class RedisUtils {
     }
 
     public static <T> void mset(Map<String, T> map, long time) {
-        Map<String, String> collect = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, (e) -> objToStr(e.getValue())));
+//        Map<String, String> collect = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, (e) -> objToStr(e.getValue())));
+        Map<String, String> collect = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, (e) -> JSONUtil.toJsonStr(e.getValue())));
         stringRedisTemplate.opsForValue().multiSet(collect);
         map.forEach((key, value) -> {
             expire(key, time);

@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.chat.service;
 
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
+import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -15,5 +16,5 @@ public interface ChatService {
      * @param uid: 发送人uid
      * @param chatMessageReq: 发送消息的消息体
      */
-    void sendMsg(Long uid, ChatMessageReq chatMessageReq);
+    ChatMessageResp sendMsg(Long uid, ChatMessageReq chatMessageReq);
 }

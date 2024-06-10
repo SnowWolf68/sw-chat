@@ -9,7 +9,7 @@
             (#{roomId},#{uid},#{msgId},#{createTime})
         </foreach>
         on DUPLICATE KEY UPDATE
-        `last_msg_id`=VALUES(msgId),
-        `active_time`=VALUES(createTime)
+        `last_msg_id`=VALUES(last_msg_id),
+        `active_time`=VALUES(active_time)
     </insert>
 </mapper>

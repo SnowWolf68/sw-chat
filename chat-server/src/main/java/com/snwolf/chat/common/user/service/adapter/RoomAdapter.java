@@ -50,7 +50,7 @@ public class RoomAdapter {
                 .uid1(uids.get(0))
                 .uid2(uids.get(1))
                 .roomKey(buildRoomKey(uids))
-                .status(StatusEnum.STATUS_VALID.getStatus())
+                .status(StatusEnum.STATUS_INVALID.getStatus())
                 .build();
     }
 }

@@ -167,7 +167,7 @@ public class UserFriendServiceImpl implements UserFriendService {
         // 判断申请记录中的targetId和当前用户uid是否一致
         AssertUtil.equal(uid, userApply.getTargetId(), "不存在申请记录");
         // 判断当前申请是否还是未同意状态
-        AssertUtil.equal(userApply.getStatus(), ApplyStatusEnum.WAIT_APPROVAL, "当前好友申请已同意");
+        AssertUtil.notEqual(userApply.getStatus(), ApplyStatusEnum.AGREE.getCode(), "当前好友申请已同意");
         // 将申请设置为已同意
         userApplyDao.approve(userApply.getId());
         // 创建好友关系, 往user_friend表中插入两条数据

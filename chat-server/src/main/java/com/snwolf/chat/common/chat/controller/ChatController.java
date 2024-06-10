@@ -37,7 +37,7 @@ public class ChatController {
     @ApiOperation("发送消息")
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq chatMessageReq){
         Long uid = RequestHolder.getUserInfo().getUid();
-        ChatMessageResp chatMessageResp = chatService.sendMsg(uid, chatMessageReq);
-        return ApiResult.success(chatMessageResp);
+        Long msgId = chatService.sendMsg(uid, chatMessageReq);
+        return ApiResult.success(chatService.buildChatMessageResp(msgId, uid));
     }
 }

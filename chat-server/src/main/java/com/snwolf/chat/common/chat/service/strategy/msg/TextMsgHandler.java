@@ -46,4 +46,10 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
         msgBody.setContent((String) body);
         messageDao.updateById(msgBody);
     }
+
+    @Override
+    public Object showMsg(Message message) {
+        // todo: 暂时简单实现一下, 只返回content中的内容
+        return message.getContent();
+    }
 }

@@ -41,4 +41,9 @@ public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO> {
         message.setExtra(extra);
         messageDao.updateById(message);
     }
+
+    @Override
+    public Object showMsg(Message message) {
+        return null;
+    }
 }

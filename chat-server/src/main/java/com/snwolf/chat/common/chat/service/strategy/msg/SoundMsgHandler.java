@@ -38,4 +38,9 @@ public class SoundMsgHandler extends AbstractMsgHandler<SoundMsgDTO> {
         message.setExtra(extra);
         messageDao.updateById(message);
     }
+
+    @Override
+    public Object showMsg(Message message) {
+        return null;
+    }
 }

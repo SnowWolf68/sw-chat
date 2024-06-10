@@ -35,4 +35,9 @@ public class EmojisMsgHandler extends AbstractMsgHandler<EmojisMsgDTO> {
         message.setExtra(extra);
         messageDao.updateById(message);
     }
+
+    @Override
+    public Object showMsg(Message message) {
+        return null;
+    }
 }

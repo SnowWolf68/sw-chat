@@ -97,4 +97,12 @@ public abstract class AbstractMsgHandler<T> {
         }
         return (T) BeanUtil.toBean(body, messageClass);
     }
+
+    /**
+     * 需子类实现
+     * <p>子类根据不同的消息类型, 返回给前端的不同展示对象
+     * @param message
+     * @return
+     */
+    public abstract Object showMsg(Message message);
 }

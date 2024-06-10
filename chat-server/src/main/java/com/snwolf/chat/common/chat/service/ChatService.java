@@ -16,5 +16,13 @@ public interface ChatService {
      * @param uid: 发送人uid
      * @param chatMessageReq: 发送消息的消息体
      */
-    ChatMessageResp sendMsg(Long uid, ChatMessageReq chatMessageReq);
+    Long sendMsg(Long uid, ChatMessageReq chatMessageReq);
+
+    /**
+     * 构建给前端的消息返回对象
+     * @param msgId
+     * @param receiveUid: 接收消息的uid
+     * @return
+     */
+    ChatMessageResp buildChatMessageResp(Long msgId, Long receiveUid);
 }

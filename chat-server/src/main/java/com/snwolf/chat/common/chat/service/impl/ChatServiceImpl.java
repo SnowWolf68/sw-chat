@@ -4,6 +4,7 @@ import com.snwolf.chat.common.chat.dao.GroupMemberDao;
 import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.dao.RoomFriendDao;
 import com.snwolf.chat.common.chat.domain.entity.GroupMember;
+import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.Room;
 import com.snwolf.chat.common.chat.domain.entity.RoomFriend;
 import com.snwolf.chat.common.chat.domain.enums.RoomFriendStatusEnum;
@@ -16,6 +17,7 @@ import com.snwolf.chat.common.chat.service.cache.RoomCache;
 import com.snwolf.chat.common.chat.service.cache.RoomGroupCache;
 import com.snwolf.chat.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.snwolf.chat.common.chat.service.strategy.msg.MsgHandlerFactory;
+import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.common.event.MessageSendEvent;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +56,7 @@ public class ChatServiceImpl implements ChatService {
     private GroupMemberDao groupMemberDao;
 
     @Override
-    public ChatMessageResp sendMsg(Long uid, ChatMessageReq chatMessageReq) {
+    public Long sendMsg(Long uid, ChatMessageReq chatMessageReq) {
         // 判断是否有权限在当前房间中发言
         checkRoom(uid, chatMessageReq.getRoomId());
         // 获取消息对应的handler处理器对象
@@ -63,7 +65,49 @@ public class ChatServiceImpl implements ChatService {
         // 发布 消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, msgId));
         // 封装ChatMessageResp, 返回
-        return MessageAdapter.buildChatMessageResp(uid, chatMessageReq, msgId);
+        return msgId;
+    }
+
+    @Override
+    public ChatMessageResp buildChatMessageResp(Long msgId, Long receiveUid) {
+        ChatMessageResp.MessageMark messageMark = getMessageMark(msgId, receiveUid);
+        ChatMessageResp.Message message = getMessage(msgId, messageMark);
+        ChatMessageResp.UserInfo userInfo = getUserInfo(msgId);
+        return ChatMessageResp.builder()
+                .message(message)
+                .fromUser(userInfo)
+                .build();
+    }
+
+    private ChatMessageResp.UserInfo getUserInfo(Long msgId) {
+        Message message = messageDao.getById(msgId);
+        return ChatMessageResp.UserInfo
+                .builder()
+                .uid(message.getFromUid())
+                .build();
+    }
+
+    private ChatMessageResp.Message getMessage(Long msgId, ChatMessageResp.MessageMark messageMark) {
+        Message message = messageDao.getById(msgId);
+        AbstractMsgHandler<?> handler = MsgHandlerFactory.getStrategy(message.getType());
+        return ChatMessageResp.Message.builder()
+                .id(msgId)
+                .roomId(message.getRoomId())
+                .sendTime(message.getCreateTime())
+                .type(message.getType())
+                .body(handler.showMsg(message))
+                .messageMark(messageMark)
+                .build();
+    }
+
+    private ChatMessageResp.MessageMark getMessageMark(Long msgId, Long receiveUid) {
+        return ChatMessageResp.MessageMark
+                .builder()
+                .likeCount(0)
+                .userLike(StatusEnum.STATUS_INVALID.getStatus())
+                .dislikeCount(0)
+                .userDislike(StatusEnum.STATUS_INVALID.getStatus())
+                .build();
     }
 
     /**

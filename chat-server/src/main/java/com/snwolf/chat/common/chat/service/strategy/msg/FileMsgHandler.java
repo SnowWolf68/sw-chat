@@ -35,4 +35,9 @@ public class FileMsgHandler extends AbstractMsgHandler<FileMsgDTO> {
         message.setExtra(extra);
         messageDao.updateById(message);
     }
+
+    @Override
+    public Object showMsg(Message message) {
+        return null;
+    }
 }

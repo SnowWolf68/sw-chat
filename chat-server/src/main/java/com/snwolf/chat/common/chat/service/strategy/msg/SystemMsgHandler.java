@@ -39,4 +39,9 @@ public class SystemMsgHandler extends AbstractMsgHandler<Object>{
         message.setContent((String) body);
         messageDao.updateById(message);
     }
+
+    @Override
+    public Object showMsg(Message message) {
+        return null;
+    }
 }

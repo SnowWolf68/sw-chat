@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.chat.controller;
 
 import com.snwolf.chat.common.chat.domain.entity.ChatMessagePageReq;
+import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageBaseReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.service.ChatService;
@@ -44,5 +45,12 @@ public class ChatController {
     @ApiOperation("消息列表")
     public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request){
         return ApiResult.success(chatService.getCursorPage(request, RequestHolder.getUserInfo().getUid()));
+    }
+
+    @PutMapping("/msg/recall")
+    @ApiOperation("撤回消息")
+    public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageBaseReq chatMessageBaseReq){
+        chatService.recallMsg(RequestHolder.getUserInfo().getUid(), chatMessageBaseReq);
+        return ApiResult.success();
     }
 }

@@ -3,8 +3,10 @@ package com.snwolf.chat.common.chat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.snwolf.chat.common.chat.dao.*;
 import com.snwolf.chat.common.chat.domain.entity.*;
+import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
 import com.snwolf.chat.common.chat.domain.enums.RoomFriendStatusEnum;
 import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
+import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageBaseReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.service.ChatService;
@@ -13,17 +15,22 @@ import com.snwolf.chat.common.chat.service.cache.RoomCache;
 import com.snwolf.chat.common.chat.service.cache.RoomGroupCache;
 import com.snwolf.chat.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.snwolf.chat.common.chat.service.strategy.msg.MsgHandlerFactory;
+import com.snwolf.chat.common.chat.service.strategy.msg.RecallMsgHandler;
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
 import com.snwolf.chat.common.common.event.MessageSendEvent;
+import com.snwolf.chat.common.common.exception.BusinessException;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.user.domain.enums.BlackTypeEnum;
+import com.snwolf.chat.common.user.domain.enums.RoleEnum;
+import com.snwolf.chat.common.user.service.RoleService;
 import com.snwolf.chat.common.user.service.cache.UserCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +71,12 @@ public class ChatServiceImpl implements ChatService {
     @Resource
     private UserCache userCache;
 
+    @Resource
+    private RoleService roleService;
+
+    @Resource
+    private RecallMsgHandler recallMsgHandler;
+
     @Override
     public Long sendMsg(Long uid, ChatMessageReq chatMessageReq) {
         // 判断是否有权限在当前房间中发言
@@ -80,6 +93,30 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatMessageResp buildSingleChatMessageResp(Long msgId, Long receiveUid) {
         return CollectionUtil.getFirst(buildChatMessageRespBatchWithMsgIds(Collections.singletonList(msgId), receiveUid));
+    }
+
+    @Override
+    public void recallMsg(Long uid, ChatMessageBaseReq request) {
+        Message message = messageDao.getById(request.getMsgId());
+        // 判断是否有撤回权限
+        checkRecallPermission(uid, message);
+        // 撤回消息(使用RecallMsgHandler中的内聚方法)
+        recallMsgHandler.recall(uid, message);
+    }
+
+    /**
+     * 判断是否有消息撤回的权限, 只要是群聊管理员(普通管理员), 即可拥有撤回他人信息的权限
+     * @param uid
+     * @param message
+     */
+    private void checkRecallPermission(Long uid, Message message) {
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.CHAT_MANAGER);
+        if(!(hasPower || uid.equals(message.getFromUid()))){
+            throw new BusinessException("没有撤回权限");
+        }
+        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL, "消息已被撤回");
+        AssertUtil.isTrue(LocalDateTime.now().minusMinutes(2L).compareTo(message.getCreateTime()) < 0, "超过2分钟的消息无法撤回");
+        recallMsgHandler.recall(uid, message);
     }
 
     @Override

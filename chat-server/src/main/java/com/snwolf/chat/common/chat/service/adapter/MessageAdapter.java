@@ -6,6 +6,7 @@ import com.snwolf.chat.common.chat.domain.enums.UserLikeEnum;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
+import com.snwolf.chat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
 import com.snwolf.chat.common.websocket.service.adapter.WebSocketAdapter;
 
@@ -80,6 +81,6 @@ public class MessageAdapter {
                 .fromUser(fromUser)
                 .message(respMsg)
                 .build();
-        return WebSocketAdapter.buildChatMessageResp(chatMessageResp);
+        return WebSocketAdapter.buildChatMessageResp(chatMessageResp, WSRespTypeEnum.MESSAGE);
     }
 }

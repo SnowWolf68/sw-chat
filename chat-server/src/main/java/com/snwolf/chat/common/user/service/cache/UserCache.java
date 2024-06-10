@@ -1,10 +1,15 @@
 package com.snwolf.chat.common.user.service.cache;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.snwolf.chat.common.common.constant.RedisKeyConstant;
+import com.snwolf.chat.common.common.constant.RedisTTLConstants;
+import com.snwolf.chat.common.common.service.cache.AbstractBatchStringRedisCache;
 import com.snwolf.chat.common.common.utils.RedisUtils;
 import com.snwolf.chat.common.user.dao.BlackDao;
+import com.snwolf.chat.common.user.dao.UserDao;
 import com.snwolf.chat.common.user.dao.UserRoleDao;
 import com.snwolf.chat.common.user.domain.entity.Black;
+import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.entity.UserRole;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,13 +20,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class UserCache {
+public class UserCache extends AbstractBatchStringRedisCache<User, Long> {
 
     @Resource
     private UserRoleDao userRoleDao;
 
     @Resource
     private BlackDao blackDao;
+
+    @Resource
+    private UserDao userDao;
 
     /**
      * 从redis中获取ids对应的用户的lastModifyTime
@@ -61,5 +69,41 @@ public class UserCache {
     @CacheEvict(cacheNames = "user", key = "'userBlackList'")
     public Map<Integer, Set<String>> evicateBlackMap() {
         return null;
+    }
+
+
+    public User getUserInfo(Long uid) {
+        return CollectionUtil.getFirst(getUserInfoBatch(Collections.singletonList(uid)));
+    }
+
+    /**
+     * 使用批量缓存框架实现用户信息的缓存
+     * todo: 用户信息更新的时候清除缓存
+     * @param uidList
+     * @return
+     */
+    public List<User> getUserInfoBatch(List<Long> uidList){
+        Map<Long, User> userMap = getBatch(uidList);
+        return uidList.stream()
+                .map(uid -> userMap.getOrDefault(uid, null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    protected String getKey(Long uid) {
+        return RedisKeyConstant.getKey(RedisKeyConstant.USER_INFO_STRING, uid);
+    }
+
+    @Override
+    protected Long getExpireSeconds() {
+        return RedisTTLConstants.USER_INFO_TTL;
+    }
+
+    @Override
+    protected Map<Long, User> load(List<Long> uidList) {
+        List<User> userList = userDao.listByIds(uidList);
+        return userList.stream()
+                .collect(Collectors.toMap(User::getId, user -> user));
     }
 }

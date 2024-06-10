@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -23,5 +24,5 @@ public class MsgRecall implements Serializable {
     //撤回消息的uid
     private Long recallUid;
     //撤回的时间点
-    private Date recallTime;
+    private LocalDateTime recallTime;
 }

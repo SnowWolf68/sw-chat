@@ -8,7 +8,10 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @EnableCaching
@@ -27,4 +30,9 @@ public class CacheConfig extends CachingConfigurerSupport {
         return cacheManager;
     }
 
+    @Bean("redisCacheManager")
+    public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        // 方案二：使用RedisCacheManager
+        return RedisCacheManager.create(redisConnectionFactory);
+    }
 }

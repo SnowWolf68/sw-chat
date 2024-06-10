@@ -16,6 +16,8 @@ public class RedisKeyConstant {
 
     public static final String ROOM_ACTIVE_TIME_STRING = "roomActiveTime";
 
+    public static final String USER_INFO_STRING = "userInfo:userId_%d";
+
     public static String getKey(String key, Object... o){
         return BASE_KEY + String.format(key, o);
     }

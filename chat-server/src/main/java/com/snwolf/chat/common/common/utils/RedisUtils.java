@@ -269,7 +269,7 @@ public class RedisUtils {
         }
 //        return list.stream().map(o -> toBeanOrNull(o, tClass)).collect(Collectors.toList());
         return list.stream()
-                .map(o -> o == null ? null : JSONUtil.toBean(o, tClass)).collect(Collectors.toList());
+                .map(o -> (o == null || o.equals("{}")) ? null : JSONUtil.toBean(o, tClass)).collect(Collectors.toList());
     }
 
     static <T> T toBeanOrNull(String json, Class<T> tClass) {

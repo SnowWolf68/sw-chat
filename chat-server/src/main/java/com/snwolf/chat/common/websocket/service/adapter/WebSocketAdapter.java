@@ -64,9 +64,9 @@ public class WebSocketAdapter {
         return response;
     }
 
-    public static WSBaseResp<ChatMessageResp> buildChatMessageResp(ChatMessageResp chatMessageResp) {
+    public static WSBaseResp<ChatMessageResp> buildChatMessageResp(ChatMessageResp chatMessageResp, WSRespTypeEnum wsRespTypeEnum) {
         WSBaseResp<ChatMessageResp> response = new WSBaseResp<>();
-        response.setType(WSRespTypeEnum.MESSAGE.getType());
+        response.setType(wsRespTypeEnum.getType());
         response.setData(chatMessageResp);
         return response;
     }

@@ -15,4 +15,6 @@ public class RedisTTLConstants {
     public static final Long ROOM_GROUP_TTL = 5 * 60L;
 
     public static final Long ROOM_ACTIVE_TIME_TTL = 5 * 60L;
+
+    public static final Long USER_INFO_TTL = 5 * 60L;
 }

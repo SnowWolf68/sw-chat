@@ -91,8 +91,9 @@ public class CursorUtils {
      * @note: 对于时间类型的cursor, 这里我们选择将其转化成毫秒值
      */
     private static String cursorToString(Object cursor) {
-        if (cursor instanceof Date) {
-            return String.valueOf(((Date) cursor).getTime());
+        if (cursor instanceof LocalDateTime) {
+            cursor = ((LocalDateTime) cursor).toInstant(java.time.ZoneOffset.of("+8")).toEpochMilli();
+            return String.valueOf(cursor);
         } else {
             return cursor.toString();
         }

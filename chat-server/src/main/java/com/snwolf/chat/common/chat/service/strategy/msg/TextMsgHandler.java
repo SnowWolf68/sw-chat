@@ -15,6 +15,8 @@ import com.snwolf.chat.common.chat.service.cache.MessageCache;
 import com.snwolf.chat.common.common.constant.MessageConstant;
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.common.utils.AssertUtil;
+import com.snwolf.chat.common.common.utils.discover.PrioritizedUrlDiscover;
+import com.snwolf.chat.common.common.utils.discover.domain.UrlInfo;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.enums.RoleEnum;
 import com.snwolf.chat.common.user.service.RoleService;
@@ -49,6 +51,7 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
     @Resource
     private MessageCache messageCache;
 
+    private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
     @Override
     MessageTypeEnum getMsgType() {
         return MessageTypeEnum.TEXT;
@@ -77,6 +80,10 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
             // 处理艾特的成员
             extra.setAtUidList(textMsgReq.getAtUidList());
         }
+        // 解析url
+        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(textMsgReq.getContent());
+        extra.setUrlContentMap(urlContentMap);
+
         updateMsg.setExtra(extra);
         messageDao.updateById(updateMsg);
     }
@@ -108,6 +115,7 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
     public Object showMsg(Message message) {
         TextMsgResp resp = new TextMsgResp();
         resp.setContent(message.getContent());
+        resp.setUrlContentMap(Optional.ofNullable(message.getExtra()).map(MessageExtra::getUrlContentMap).orElse(null));
         resp.setAtUidList(Optional.ofNullable(message.getExtra()).map(MessageExtra::getAtUidList).orElse(null));
         // 判断是否有回复消息
         Optional<Message> reply = Optional.ofNullable(message.getReplyMsgId())

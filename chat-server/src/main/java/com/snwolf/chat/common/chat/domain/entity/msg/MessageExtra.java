@@ -2,6 +2,7 @@ package com.snwolf.chat.common.chat.domain.entity.msg;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.snwolf.chat.common.common.utils.discover.domain.UrlInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -24,6 +26,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MessageExtra implements Serializable {
     private static final long serialVersionUID = 1L;
+    //url跳转链接
+    private Map<String, UrlInfo> urlContentMap;
     //消息撤回详情
     private MsgRecall recall;
     //艾特的uid

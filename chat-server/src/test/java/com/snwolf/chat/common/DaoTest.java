@@ -36,7 +36,7 @@ public class DaoTest {
 
     @Test
     void test2(){
-        String token = loginService.login(20031L);
+        String token = loginService.login(20001L);
         log.info(token);
     }
 }

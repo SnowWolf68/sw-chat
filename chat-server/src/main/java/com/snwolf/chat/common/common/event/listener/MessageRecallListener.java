@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -55,6 +56,10 @@ public class MessageRecallListener {
         if(room.getType().equals(RoomTypeEnum.GROUP.getType())){
             // 群聊
             uidList = roomMemberCache.getMemberIdList(roomId);
+            // 从redis中取出来的对象有可能是Integer类型, 因此这里需要做一次兼容
+            for (int i = 0; i < uidList.size(); i++) {
+                uidList.set(i, Long.parseLong(String.valueOf(uidList.get(i))));
+            }
         }else{
             // 单聊
             RoomFriend roomFriend = roomFriendDao.getByRoomId(roomId);

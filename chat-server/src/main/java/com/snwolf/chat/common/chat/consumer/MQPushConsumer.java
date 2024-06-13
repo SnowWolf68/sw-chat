@@ -1,6 +1,7 @@
 package com.snwolf.chat.common.chat.consumer;
 
 import com.snwolf.chat.common.chat.domain.dto.PushMessageDTO;
+import com.snwolf.chat.common.chat.domain.enums.WSPushTypeEnum;
 import com.snwolf.chat.common.common.constant.MQConstant;
 import com.snwolf.chat.common.websocket.service.WebSocketService;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -8,6 +9,7 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -28,6 +30,11 @@ public class MQPushConsumer implements RocketMQListener<PushMessageDTO> {
      */
     @Override
     public void onMessage(PushMessageDTO pushMessageDTO) {
-        webSocketService.pushMsgToAll(pushMessageDTO.getWsBaseMsg());
+        Integer pushType = pushMessageDTO.getPushType();
+        if(Objects.equals(pushType, WSPushTypeEnum.ALL.getType())){
+            webSocketService.pushMsgToAll(pushMessageDTO.getWsBaseMsg());
+        }else{
+            webSocketService.pushMsgToTargetUid(pushMessageDTO.getWsBaseMsg(), pushMessageDTO.getUid());
+        }
     }
 }

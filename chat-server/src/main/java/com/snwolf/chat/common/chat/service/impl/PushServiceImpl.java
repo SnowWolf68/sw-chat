@@ -30,6 +30,9 @@ public class PushServiceImpl implements PushService {
 
     @Override
     public void sendPushMsg(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp, List<Long> uidList) {
-        uidList.forEach(uid -> rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(chatMessageRespWSBaseResp, uid)));
+//        uidList.forEach(uid -> rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(chatMessageRespWSBaseResp, uid)));
+        for (Long uid : uidList) {
+            rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(chatMessageRespWSBaseResp, uid));
+        }
     }
 }

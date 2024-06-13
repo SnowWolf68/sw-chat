@@ -39,6 +39,6 @@ public class UserApplyListener {
         // 获取被申请人一共有多少条未读申请
         Integer count = userApplyDao.getUnReadCount(userApply.getTargetId());
         // 封装响应, ws发送响应
-        webSocketService.sendMsgToTargetId(WebSocketAdapter.buildUserApplyResp(userApply.getUid(), count), userApply.getTargetId());
+        webSocketService.pushMsgToTargetUid(WebSocketAdapter.buildUserApplyResp(userApply.getUid(), count), userApply.getTargetId());
     }
 }

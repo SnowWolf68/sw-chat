@@ -29,7 +29,7 @@ public class RoomMemberCache {
      * @param roomId
      * @return
      */
-//    @Cacheable(cacheNames = "roomMember", key = "'roomMember:' + #roomId", cacheManager = "redisCacheManager")
+    @Cacheable(cacheNames = "swchat", key = "'roomMember:roomId_' + #roomId", cacheManager = "redisCacheManager")
     public List<Long> getMemberIdList(Long roomId){
         Long groupId = roomGroupCache.get(roomId);
         return groupMemberDao.getMemberIdsByGroupId(groupId);

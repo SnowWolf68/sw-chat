@@ -99,7 +99,7 @@ public class ChatServiceImpl implements ChatService {
     public void recallMsg(Long uid, ChatMessageBaseReq request) {
         Message message = messageDao.getById(request.getMsgId());
         // 判断是否有撤回权限
-        checkRecallPermission(uid, message);
+//        checkRecallPermission(uid, message);
         // 撤回消息(使用RecallMsgHandler中的内聚方法)
         recallMsgHandler.recall(uid, message);
     }

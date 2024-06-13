@@ -140,22 +140,22 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public void sendMsgToTargetId(WSBaseResp<WSFriendApply> wsFriendApplyWSBaseResp, Long targetId) {
+    public void pushMsgToTargetUid(WSBaseResp<?> wsBaseResp, Long targetId) {
         Map<Long, Channel> idChannelMap = new HashMap<>();
         ONLINE_WS_MAP.forEach((channel, wsChannelExtraDTO) -> {
             idChannelMap.put(wsChannelExtraDTO.getUid(), channel);
         });
         if(idChannelMap.containsKey(targetId)){
-            sendMsg(idChannelMap.get(targetId), wsFriendApplyWSBaseResp);
+            sendMsg(idChannelMap.get(targetId), wsBaseResp);
         }else{
             log.info("targetId: {} 未上线, 无法进行在线推送", targetId);
         }
     }
 
     @Override
-    public void pushMsgToAll(WSBaseResp<?> chatMessageRespWSBaseResp) {
+    public void pushMsgToAll(WSBaseResp<?> wsBaseResp) {
         // 推送给所有在线用户
-        ONLINE_WS_MAP.keySet().forEach(channel -> sendMsg(channel, chatMessageRespWSBaseResp));
+        ONLINE_WS_MAP.keySet().forEach(channel -> sendMsg(channel, wsBaseResp));
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> response) {

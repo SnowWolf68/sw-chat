@@ -88,4 +88,13 @@ public class RedisTest {
         )), 60 * 60L);
     }
 
+    /**
+     * 测试RedisUtil工具类中的序列化器是什么
+     */
+    @Test
+    void testRedisUtilsSerialize(){
+        List<Integer> list = Arrays.asList(20001, 20031);
+        RedisUtils.set("testSerialize", list);
+    }
+
 }

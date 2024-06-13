@@ -21,7 +21,7 @@ public class PushMessageAdapter {
                 .build();
     }
 
-    public static Object buildPushMessage(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp, Long uid) {
+    public static PushMessageDTO buildPushMessage(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp, Long uid) {
         return PushMessageDTO.builder()
                 .wsBaseMsg(chatMessageRespWSBaseResp)
                 .pushType(WSPushTypeEnum.USER.getType())

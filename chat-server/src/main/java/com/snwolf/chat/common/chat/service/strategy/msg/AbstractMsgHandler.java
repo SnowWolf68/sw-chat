@@ -106,4 +106,12 @@ public abstract class AbstractMsgHandler<T> {
      * @return
      */
     public abstract Object showMsg(Message message);
+
+    /**
+     * 被回复时展示的消息
+     */
+    public Object showReplyMsg(Message msg){
+        return "回复消息格式未设置";
+    }
+
 }

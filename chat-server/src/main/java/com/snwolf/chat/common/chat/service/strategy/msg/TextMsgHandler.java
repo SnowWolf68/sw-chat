@@ -6,9 +6,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
+import com.snwolf.chat.common.chat.domain.enums.MessageStatusEnum;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.req.msg.TextMsgReq;
+import com.snwolf.chat.common.chat.domain.vo.resp.msg.TextMsgResp;
+import com.snwolf.chat.common.chat.service.cache.MessageCache;
+import com.snwolf.chat.common.common.constant.MessageConstant;
+import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.common.utils.AssertUtil;
 import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.enums.RoleEnum;
@@ -19,6 +24,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -38,6 +45,9 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
 
     @Resource
     private RoleService roleService;
+
+    @Resource
+    private MessageCache messageCache;
 
     @Override
     MessageTypeEnum getMsgType() {
@@ -96,7 +106,31 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
 
     @Override
     public Object showMsg(Message message) {
-        // todo: 暂时简单实现一下, 只返回content中的内容
-        return message.getContent();
+        TextMsgResp resp = new TextMsgResp();
+        resp.setContent(message.getContent());
+        resp.setAtUidList(Optional.ofNullable(message.getExtra()).map(MessageExtra::getAtUidList).orElse(null));
+        // 判断是否有回复消息
+        Optional<Message> reply = Optional.ofNullable(message.getReplyMsgId())
+                .map(messageCache::getMessage)
+                .filter(a -> Objects.equals(a.getStatus(), MessageStatusEnum.NORMAL.getStatus()));
+        if (reply.isPresent()) {
+            Message replyMessage = reply.get();
+            TextMsgResp.ReplyMsg replyMsgVO = new TextMsgResp.ReplyMsg();
+            replyMsgVO.setId(replyMessage.getId());
+            replyMsgVO.setUid(replyMessage.getFromUid());
+            replyMessage.setType(replyMessage.getType());
+            replyMsgVO.setBody(MsgHandlerFactory.getStrategy(replyMessage.getType()).showReplyMsg(replyMessage));
+            User replyUser = userCache.getUserInfo(replyMessage.getFromUid());
+            replyMsgVO.setUsername(replyUser.getName());
+            replyMsgVO.setCanCallback(message.getGapCount() <= MessageConstant.CAN_CALLBACK_GAP_COUNT ? StatusEnum.STATUS_VALID.getStatus() : StatusEnum.STATUS_INVALID.getStatus());
+            replyMsgVO.setGapCount(message.getGapCount());
+            resp.setReply(replyMsgVO);
+        }
+        return resp;
+    }
+
+    @Override
+    public Object showReplyMsg(Message msg) {
+        return msg.getContent();
     }
 }

@@ -51,7 +51,7 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
         }
         if(CollectionUtil.isNotEmpty(textMsgReq.getAtUidList())){
             // 处理艾特的成员
-
+            extra.setAtUidList(textMsgReq.getAtUidList());
         }
         updateMsg.setExtra(extra);
         messageDao.updateById(updateMsg);

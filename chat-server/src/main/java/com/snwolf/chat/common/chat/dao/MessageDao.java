@@ -3,11 +3,9 @@ package com.snwolf.chat.common.chat.dao;
 import cn.hutool.core.util.ObjectUtil;
 import com.snwolf.chat.common.chat.domain.entity.ChatMessagePageReq;
 import com.snwolf.chat.common.chat.domain.entity.Message;
-import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.mapper.MessageMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
-import com.snwolf.chat.common.common.exception.BusinessException;
 import com.snwolf.chat.common.common.utils.CursorUtils;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
@@ -29,5 +27,13 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
             wrapper.eq(Message::getRoomId, request.getRoomId());
             wrapper.lt(ObjectUtil.isNotNull(lastMsgId), Message::getId, lastMsgId);
         }, this, Message::getId);
+    }
+
+    public int getGapCount(Long replyMsgId, Long msgId, Long roomId) {
+        return lambdaQuery()
+                .eq(Message::getRoomId, roomId)
+                .gt(Message::getId, replyMsgId)
+                .le(Message::getId, msgId)
+                .count();
     }
 }

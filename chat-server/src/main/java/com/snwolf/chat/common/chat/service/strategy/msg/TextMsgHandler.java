@@ -1,13 +1,16 @@
 package com.snwolf.chat.common.chat.service.strategy.msg;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
+import com.snwolf.chat.common.chat.domain.vo.req.msg.TextMsgReq;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -34,17 +37,24 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
      */
     @Override
     public void saveMsg(Message msg, Object body) {
-        Message msgBody = new Message();
-        // 注意msg中可能会携带extra, 但是在第一阶段的保存中, 没有将extra保存到message表中, 因此这里我们需要保存msg中的extra
-        // 注意msg.getExtra()有可能为null
-        MessageExtra extra = Optional.ofNullable(msg.getExtra())
-                .orElse(new MessageExtra());
-        msgBody.setId(msg.getId());
-        msgBody.setExtra(extra);
-        // todo: 文本类型的消息体其实也包括了艾特内容, 回复内容,
-        //  后续需要将文本类型的消息也做一层封装, 但是这里为了处理简单, 我们假设文本类型的消息体只是String类型, 所以这里直接强转body为String
-        msgBody.setContent((String) body);
-        messageDao.updateById(msgBody);
+        TextMsgReq textMsgReq = BeanUtil.toBean(body, TextMsgReq.class);
+        MessageExtra extra = new MessageExtra();
+        Message updateMsg = new Message();
+        updateMsg.setId(msg.getId());
+        updateMsg.setContent(textMsgReq.getContent());
+        if(ObjectUtil.isNotNull(textMsgReq.getReplyMsgId())){
+            // 处理回复的消息
+            // 计算当前消息和回复的消息之间间隔多少条消息
+            int count = messageDao.getGapCount(textMsgReq.getReplyMsgId(), msg.getId(), msg.getRoomId());
+            updateMsg.setGapCount(count);
+            updateMsg.setReplyMsgId(textMsgReq.getReplyMsgId());
+        }
+        if(CollectionUtil.isNotEmpty(textMsgReq.getAtUidList())){
+            // 处理艾特的成员
+
+        }
+        updateMsg.setExtra(extra);
+        messageDao.updateById(updateMsg);
     }
 
     @Override

@@ -7,10 +7,18 @@ import com.snwolf.chat.common.chat.dao.MessageDao;
 import com.snwolf.chat.common.chat.domain.entity.Message;
 import com.snwolf.chat.common.chat.domain.entity.msg.MessageExtra;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
+import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.req.msg.TextMsgReq;
+import com.snwolf.chat.common.common.utils.AssertUtil;
+import com.snwolf.chat.common.user.domain.entity.User;
+import com.snwolf.chat.common.user.domain.enums.RoleEnum;
+import com.snwolf.chat.common.user.service.RoleService;
+import com.snwolf.chat.common.user.service.cache.UserCache;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="https://github.com/SnowWolf68">SnowWolf68</a>
@@ -24,6 +32,12 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
 
     @Resource
     private MessageDao messageDao;
+
+    @Resource
+    private UserCache userCache;
+
+    @Resource
+    private RoleService roleService;
 
     @Override
     MessageTypeEnum getMsgType() {
@@ -55,6 +69,29 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
         }
         updateMsg.setExtra(extra);
         messageDao.updateById(updateMsg);
+    }
+
+    @Override
+    protected void checkExtra(ChatMessageReq req, Long uid) {
+        TextMsgReq textMsgReq = BeanUtil.toBean(req.getBody(), TextMsgReq.class);
+        // 校验回复的消息是否合法
+        if(ObjectUtil.isNotNull(textMsgReq.getReplyMsgId())){
+            Message replyMsg = messageDao.getById(textMsgReq.getReplyMsgId());
+            AssertUtil.isNotEmpty(replyMsg, "回复的消息不存在");
+            AssertUtil.equal(replyMsg.getRoomId(), req.getRoomId(), "只能回复同一房间中的消息");
+        }
+        // 校验艾特列表是否合法
+        List<Long> atUidList = textMsgReq.getAtUidList();
+        if(CollectionUtil.isNotEmpty(atUidList)){
+            // 判断艾特的成员是否存在
+            Map<Long, User> userMap = userCache.getBatch(atUidList);
+            AssertUtil.equal(userMap.keySet().size(), atUidList.size(), "有一些艾特的成员不存在");
+            // 判断是否有艾特全部成员的权限
+            // 这里规定, 如果艾特全部成员, 那么aiUidList中会传入一个0值
+            if(atUidList.contains(0L)){
+                AssertUtil.isTrue(roleService.hasPower(uid, RoleEnum.CHAT_MANAGER), "只有管理员才能艾特全体成员");
+            }
+        }
     }
 
     @Override

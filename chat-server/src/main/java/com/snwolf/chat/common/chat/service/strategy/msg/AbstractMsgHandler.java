@@ -53,8 +53,9 @@ public abstract class AbstractMsgHandler<T> {
     /**
      * 子类选择性重写
      * <p>子类添加额外的校验规则
+     * <p>由于text类型的消息, 其有一部分信息是在req中携带的(回复消息id, 艾特成员列表), 因此这里校验的时候参数需要是ChatMessageReq
      */
-    protected void checkExtra(T body, Long roomId, Long uid){}
+    protected void checkExtra(ChatMessageReq chatMessageReq, Long uid){}
 
     /**
      * 需子类重写
@@ -76,7 +77,7 @@ public abstract class AbstractMsgHandler<T> {
         T msgBody = toBean(chatMessageReq.getBody());
         AssertUtil.allCheckValidateThrow(msgBody);
         // 子类拓展校验
-        checkExtra(msgBody, chatMessageReq.getRoomId(), uid);
+        checkExtra(chatMessageReq, uid);
         // 统一保存
         Message baseMessage = MessageAdapter.buildMessageWithoutBody(uid, chatMessageReq);
         messageDao.save(baseMessage);

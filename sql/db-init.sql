@@ -226,3 +226,19 @@ CREATE TABLE `secure_invoke_record` (
                                         PRIMARY KEY (`id`) USING BTREE,
                                         KEY `idx_next_retry_time` (`next_retry_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='本地消息表';
+
+DROP TABLE IF EXISTS `message_mark`;
+CREATE TABLE `message_mark`  (
+                                 `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
+                                 `msg_id` bigint(20) NOT NULL COMMENT '消息表id',
+                                 `uid` bigint(20) NOT NULL COMMENT '标记人uid',
+                                 `type` int(11) NOT NULL COMMENT '标记类型 1点赞 2举报',
+                                 `status` int(11) NOT NULL COMMENT '消息状态 0正常 1取消',
+                                 `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+                                 `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '修改时间',
+                                 PRIMARY KEY (`id`) USING BTREE,
+                                 INDEX `idx_msg_id`(`msg_id`) USING BTREE,
+                                 INDEX `idx_uid`(`uid`) USING BTREE,
+                                 INDEX `idx_create_time`(`create_time`) USING BTREE,
+                                 INDEX `idx_update_time`(`update_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '消息标记表' ROW_FORMAT = Dynamic;

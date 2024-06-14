@@ -14,7 +14,14 @@ import java.util.Map;
 public interface UrlDiscover {
 
     /**
-     * 获取文本content中的所有url的信息
+     * 获取文本content中的所有url的信息, 异步并行解析
+     * @param content: 文本
+     * @Return: {@code <url, urlInfo>}, 由于文本content中可能包含多个url, 因此使用map的方式返回
+     */
+    Map<String, UrlInfo> getUrlContentMapAsync(String content);
+
+    /**
+     * 获取文本content中的所有url的信息, 串行解析
      * @param content: 文本
      * @Return: {@code <url, urlInfo>}, 由于文本content中可能包含多个url, 因此使用map的方式返回
      */

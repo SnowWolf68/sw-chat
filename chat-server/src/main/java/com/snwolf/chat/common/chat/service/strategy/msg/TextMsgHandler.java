@@ -21,6 +21,7 @@ import com.snwolf.chat.common.user.domain.entity.User;
 import com.snwolf.chat.common.user.domain.enums.RoleEnum;
 import com.snwolf.chat.common.user.service.RoleService;
 import com.snwolf.chat.common.user.service.cache.UserCache;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -37,6 +38,7 @@ import java.util.Optional;
  * @note: 文本消息的消息体不需要额外的包装类来接收, 因此泛型是Object
  */
 @Component
+@Slf4j
 public class TextMsgHandler extends AbstractMsgHandler<Object>{
 
     @Resource
@@ -81,7 +83,10 @@ public class TextMsgHandler extends AbstractMsgHandler<Object>{
             extra.setAtUidList(textMsgReq.getAtUidList());
         }
         // 解析url
-        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(textMsgReq.getContent());
+        long begin = System.currentTimeMillis();
+        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMapAsync(textMsgReq.getContent());
+        long end = System.currentTimeMillis();
+        log.info("解析url耗时: {}", end - begin);
         extra.setUrlContentMap(urlContentMap);
 
         updateMsg.setExtra(extra);

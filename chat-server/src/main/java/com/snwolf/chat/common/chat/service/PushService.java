@@ -1,6 +1,5 @@
 package com.snwolf.chat.common.chat.service;
 
-import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
 
 import java.util.List;
@@ -16,9 +15,9 @@ public interface PushService {
 
     /**
      * 将消息推送给mq
-     * @param chatMessageRespWSBaseResp
+     * @param msg
      */
-    void sendPushMsg(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp);
+    void sendPushMsg(WSBaseResp<?> msg);
 
-    void sendPushMsg(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp, List<Long> uidList);
+    void sendPushMsg(WSBaseResp<?> msg, List<Long> uidList);
 }

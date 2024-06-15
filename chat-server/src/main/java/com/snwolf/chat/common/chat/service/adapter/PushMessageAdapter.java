@@ -2,7 +2,6 @@ package com.snwolf.chat.common.chat.service.adapter;
 
 import com.snwolf.chat.common.chat.domain.dto.PushMessageDTO;
 import com.snwolf.chat.common.chat.domain.enums.WSPushTypeEnum;
-import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
 
 /**
@@ -14,16 +13,16 @@ import com.snwolf.chat.common.websocket.domain.vo.response.WSBaseResp;
 public class PushMessageAdapter {
 
 
-    public static PushMessageDTO buildPushMessage(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp) {
+    public static PushMessageDTO buildPushMessage(WSBaseResp<?> msg) {
         return PushMessageDTO.builder()
-                .wsBaseMsg(chatMessageRespWSBaseResp)
+                .wsBaseMsg(msg)
                 .pushType(WSPushTypeEnum.ALL.getType())
                 .build();
     }
 
-    public static PushMessageDTO buildPushMessage(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp, Long uid) {
+    public static PushMessageDTO buildPushMessage(WSBaseResp<?> msg, Long uid) {
         return PushMessageDTO.builder()
-                .wsBaseMsg(chatMessageRespWSBaseResp)
+                .wsBaseMsg(msg)
                 .pushType(WSPushTypeEnum.USER.getType())
                 .uid(uid)
                 .build();

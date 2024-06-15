@@ -4,15 +4,19 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.snwolf.chat.common.chat.dao.*;
 import com.snwolf.chat.common.chat.domain.entity.*;
 import com.snwolf.chat.common.chat.domain.enums.MessageTypeEnum;
+import com.snwolf.chat.common.chat.domain.enums.MsgReqMarkStatusEnum;
 import com.snwolf.chat.common.chat.domain.enums.RoomFriendStatusEnum;
 import com.snwolf.chat.common.chat.domain.enums.RoomTypeEnum;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageBaseReq;
+import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageMarkReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.service.ChatService;
 import com.snwolf.chat.common.chat.service.adapter.MessageAdapter;
 import com.snwolf.chat.common.chat.service.cache.RoomCache;
 import com.snwolf.chat.common.chat.service.cache.RoomGroupCache;
+import com.snwolf.chat.common.chat.service.strategy.mark.AbstractMsgMarkStrategy;
+import com.snwolf.chat.common.chat.service.strategy.mark.MsgMarkStrategyFactory;
 import com.snwolf.chat.common.chat.service.strategy.msg.AbstractMsgHandler;
 import com.snwolf.chat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.snwolf.chat.common.chat.service.strategy.msg.RecallMsgHandler;
@@ -102,6 +106,19 @@ public class ChatServiceImpl implements ChatService {
 //        checkRecallPermission(uid, message);
         // 撤回消息(使用RecallMsgHandler中的内聚方法)
         recallMsgHandler.recall(uid, message);
+    }
+
+    @Override
+    public void msgMark(Long uid, ChatMessageMarkReq chatMessageMarkReq) {
+        AbstractMsgMarkStrategy msgMarkStrategy = MsgMarkStrategyFactory.getStrategyNoNull(chatMessageMarkReq.getMarkType());
+        switch (MsgReqMarkStatusEnum.of(chatMessageMarkReq.getActType())){
+            case MARK:
+                msgMarkStrategy.mark(uid, chatMessageMarkReq.getMsgId());
+                break;
+            case UN_MARK:
+                msgMarkStrategy.unMark(uid, chatMessageMarkReq.getMsgId());
+                break;
+        }
     }
 
     /**

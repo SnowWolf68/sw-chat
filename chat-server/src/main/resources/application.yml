@@ -27,9 +27,9 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
 # 配置mp控制台打印sql语句
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 wx:
   mp:
     #    callback:

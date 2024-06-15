@@ -1,12 +1,15 @@
 package com.snwolf.chat.common.websocket.service.adapter;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.snwolf.chat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.common.domain.enums.StatusEnum;
 import com.snwolf.chat.common.user.domain.entity.User;
-import com.snwolf.chat.common.user.domain.enums.ApplyTypeEnum;
 import com.snwolf.chat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.snwolf.chat.common.websocket.domain.vo.response.*;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+
+import java.util.Collections;
 
 public class WebSocketAdapter {
 
@@ -68,6 +71,23 @@ public class WebSocketAdapter {
         WSBaseResp<ChatMessageResp> response = new WSBaseResp<>();
         response.setType(wsRespTypeEnum.getType());
         response.setData(chatMessageResp);
+        return response;
+    }
+
+    public static WSBaseResp<WSMsgMark> buildMsgMarkResp(ChatMessageMarkDTO chatMessageMarkDTO, Integer count) {
+        WSMsgMark.WSMsgMarkItem wsMsgMarkItem = WSMsgMark.WSMsgMarkItem.builder()
+                .uid(chatMessageMarkDTO.getUid())
+                .msgId(chatMessageMarkDTO.getMsgId())
+                .markType(chatMessageMarkDTO.getMarkType())
+                .markCount(count)
+                .actType(chatMessageMarkDTO.getActType())
+                .build();
+        WSMsgMark wsMsgMark = WSMsgMark.builder()
+                .markList(Collections.singletonList(wsMsgMarkItem))
+                .build();
+        WSBaseResp<WSMsgMark> response = new WSBaseResp<>();
+        response.setType(WSRespTypeEnum.MARK.getType());
+        response.setData(wsMsgMark);
         return response;
     }
 }

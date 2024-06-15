@@ -16,6 +16,7 @@ public class WSMsgMark {
     private List<WSMsgMarkItem> markList;
 
     @Data
+    @Builder
     public static class WSMsgMarkItem {
         @ApiModelProperty("操作者")
         private Long uid;

@@ -2,6 +2,7 @@ package com.snwolf.chat.common.chat.service;
 
 import com.snwolf.chat.common.chat.domain.entity.ChatMessagePageReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageBaseReq;
+import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageMarkReq;
 import com.snwolf.chat.common.chat.domain.vo.req.ChatMessageReq;
 import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.common.domain.vo.resp.CursorPageBaseResp;
@@ -27,4 +28,6 @@ public interface ChatService {
     ChatMessageResp buildSingleChatMessageResp(Long msgId, Long receiveUid);
 
     void recallMsg(Long uid, ChatMessageBaseReq request);
+
+    void msgMark(Long uid, ChatMessageMarkReq chatMessageMarkReq);
 }

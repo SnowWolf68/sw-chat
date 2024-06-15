@@ -1,6 +1,5 @@
 package com.snwolf.chat.common.chat.service.impl;
 
-import com.snwolf.chat.common.chat.domain.vo.resp.ChatMessageResp;
 import com.snwolf.chat.common.chat.service.PushService;
 import com.snwolf.chat.common.chat.service.adapter.PushMessageAdapter;
 import com.snwolf.chat.common.common.constant.MQConstant;
@@ -24,15 +23,15 @@ public class PushServiceImpl implements PushService {
     private RocketMQTemplate rocketMQTemplate;
 
     @Override
-    public void sendPushMsg(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp) {
-        rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(chatMessageRespWSBaseResp));
+    public void sendPushMsg(WSBaseResp<?> msg) {
+        rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(msg));
     }
 
     @Override
-    public void sendPushMsg(WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp, List<Long> uidList) {
-//        uidList.forEach(uid -> rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(chatMessageRespWSBaseResp, uid)));
+    public void sendPushMsg(WSBaseResp<?> msg, List<Long> uidList) {
+//        uidList.forEach(uid -> rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(msg, uid)));
         for (Long uid : uidList) {
-            rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(chatMessageRespWSBaseResp, uid));
+            rocketMQTemplate.convertAndSend(MQConstant.PUSH_MSG_TOPIC, PushMessageAdapter.buildPushMessage(msg, uid));
         }
     }
 }
